@@ -9,8 +9,13 @@ exists for Copilot Chat and Copilot code review. Keep the two in sync — edit
 
 ALMFx is a multi-format toolkit for SharePoint Framework (SPFx) Application
 Lifecycle Management and PnP provisioning: a PowerShell module
-(`src/powershell/ALMFx/`), standalone scripts (`scripts/`), VS Code extensions
-(`src/vscode/`), and downloadable agent skills (`plugins/almfx/skills/`).
+(`src/powershell/ALMFx/`), a VS Code extension (`src/vscode/almfx/`), standalone
+scripts (`scripts/`, not started), and downloadable agent skills
+(`plugins/almfx/skills/`, empty until ALMFx has a surface worth driving).
+
+**Domain knowledge — cmdlet names, procedures, failure modes — lives in
+[`docs/reference/spfx-alm/`](../docs/reference/spfx-alm/), once.** Link to it;
+never restate a fact from it elsewhere.
 
 ## Non-negotiables
 

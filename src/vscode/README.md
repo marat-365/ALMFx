@@ -1,34 +1,35 @@
-# VS Code extensions
+# VS Code
 
-Not yet scaffolded. Intended layout:
+One extension: [`almfx/`](almfx/). Scaffold only — activation, command
+registration, an output channel, and one placeholder command. No ALM
+functionality yet.
 
 ```
-src/vscode/
-├── shared/                 Domain logic shared by both extensions.
-│                           Keep vscode API imports out of pure-domain modules
-│                           so they stay unit-testable.
-├── almfx-spfx-alm/         ALM operations: deploy, upgrade, inventory
-└── almfx-provisioning/     PnP provisioning template authoring
+src/vscode/almfx/
+├── package.json            Commands, settings, activation
+├── tsconfig.json           strict: true
+├── .eslintrc.json
+└── src/extension.ts
 ```
 
-Each extension gets its own `package.json`, `tsconfig.json`, `CHANGELOG.md`,
-`README.md`, and version stream. Wire them together with npm workspaces from the
-repository root when the first one is scaffolded.
+## Why one and not two
 
-## Open decision
-
-Two extensions or one? The audiences (admins deploying packages, makers
-authoring templates) overlap but are not identical. Two thin extensions over a
-shared library keeps the option open. **Decide before the first Marketplace
-publish** — merging is cheap, splitting a published extension is not. Record the
-decision in `docs/adr/`.
+The original plan was two extensions — ALM operations and provisioning authoring
+— over a shared library. The audiences overlap enough that two empty extensions
+was speculative structure. Nothing is published, so splitting later is still
+cheap; do it with an ADR and add `src/vscode/shared/` at the same time. See
+[`docs/adr/0001`](../../docs/adr/0001-record-architecture-decisions.md).
 
 ## Prior art
 
-`pnp/vscode-viva` — the SPFx Toolkit, MIT licensed, Microsoft 365 Community.
-Worth reading before designing anything here. It already covers scaffolding,
-project upgrade, and environment views; ALMFx should complement it rather than
-duplicate it. Deliberately overlapping is a decision that belongs in an ADR.
+[`pnp/vscode-viva`](https://github.com/pnp/vscode-viva) — the SPFx Toolkit, MIT,
+Microsoft 365 Community. Worth reading before designing anything here. It already
+covers scaffolding, project upgrade, and environment views; ALMFx should
+complement it rather than duplicate it. Deliberate overlap needs an ADR.
 
-Rules: `.github/instructions/typescript.instructions.md`,
-`.claude/skills/vscode-extension/SKILL.md`.
+## Rules
+
+- [`.github/instructions/typescript.instructions.md`](../../.github/instructions/typescript.instructions.md)
+- [`.claude/skills/vscode-extension/SKILL.md`](../../.claude/skills/vscode-extension/SKILL.md)
+- Domain facts go in [`docs/reference/spfx-alm/`](../../docs/reference/spfx-alm/),
+  not in extension copy.

@@ -31,7 +31,7 @@ the extensions, and vice versa.
    chore(release): ALMFx v0.2.0
    git tag ps-v0.2.0
    ```
-   Tag prefixes: `ps-`, `vscode-spfx-alm-`, `vscode-provisioning-`, `plugin-`.
+   Tag prefixes: `ps-`, `vscode-`, `plugin-`.
 6. **Publish** — CI does this on the tag. Manual fallback:
    ```powershell
    Publish-Module -Path ./out/ALMFx -NuGetApiKey $env:PSGALLERY_API_KEY

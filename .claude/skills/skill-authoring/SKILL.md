@@ -17,6 +17,20 @@ description: Use when writing or editing any SKILL.md in this repo, in either pl
 A product skill that references this repository's build system or file paths is
 a bug. Ask which one is meant if it is not obvious.
 
+`plugins/almfx/skills/` is deliberately empty right now — ALMFx has no cmdlets or
+extension commands yet worth writing a skill around. See
+`plugins/almfx/skills/README.md` before adding the first one.
+
+## Domain facts do not live in skills
+
+Cmdlet names, procedures, and failure modes belong in
+[`docs/reference/spfx-alm/`](../../../docs/reference/spfx-alm/), written once.
+A skill **links** to the relevant reference page; it does not restate cmdlet
+signatures, version-bump rules, or troubleshooting steps. A skill that
+duplicates a fact from the reference is the exact drift this rule exists to
+prevent — two copies of "how `Update-PnPApp` works" will eventually disagree,
+and nothing will tell you which one is stale.
+
 ## Frontmatter
 
 ```yaml
@@ -59,5 +73,7 @@ extensions (`.sppkg`, `package-solution.json`, "tenant-wide deployment").
 ## Accuracy
 
 Verify every cmdlet, parameter, and CLI flag against
-`.claude/skills/pnp-reference/`. A skill that confidently tells an agent to run
-a cmdlet that does not exist is worse than no skill.
+[`docs/reference/spfx-alm/cmdlets.md`](../../../docs/reference/spfx-alm/cmdlets.md)
+— see `.claude/skills/pnp-reference/` for the verification method if the cmdlet
+you need is not already listed there. A skill that confidently tells an agent to
+run a cmdlet that does not exist is worse than no skill.

@@ -1,0 +1,62 @@
+{
+  "name": "almfx",
+  "displayName": "ALMFx",
+  "description": "Application lifecycle management for SharePoint Framework solutions and PnP provisioning.",
+  "version": "0.0.1",
+  "publisher": "marat-365",
+  "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/marat-365/ALMFx.git",
+    "directory": "src/vscode/almfx"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "sharepoint",
+    "spfx",
+    "pnp",
+    "microsoft365"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [],
+  "contributes": {
+    "commands": [
+      {
+        "command": "almfx.showVersion",
+        "title": "Show Version",
+        "category": "ALMFx"
+      }
+    ],
+    "configuration": {
+      "title": "ALMFx",
+      "properties": {
+        "almfx.tenantUrl": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "SharePoint Online tenant URL, for example `https://contoso.sharepoint.com`. Leave blank to be prompted."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts",
+    "test": "npm run compile && npm run lint",
+    "package": "vsce package --no-dependencies"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.56.0",
+    "typescript": "^5.3.0"
+  }
+}

@@ -448,3 +448,7 @@ release/
 
 # PowerShell
 *.psd1.bak
+
+# VS Code extension build output
+dist/
+*.vsix

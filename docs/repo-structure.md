@@ -28,7 +28,7 @@ ALMFx/
 ├── plugins/
 │   └── almfx/                     The plugin users install
 │       ├── .claude-plugin/plugin.json
-│       └── skills/                Skills shipped TO users
+│       └── skills/                Skills shipped TO users — empty for now
 │
 ├── src/
 │   ├── powershell/ALMFx/
@@ -39,14 +39,15 @@ ALMFx/
 │   │   ├── Classes/               PowerShell classes / output types
 │   │   └── en-US/                 about_* help topics
 │   └── vscode/
-│       ├── shared/                TypeScript shared by extensions
-│       ├── almfx-spfx-alm/        Extension: ALM operations
-│       └── almfx-provisioning/    Extension: PnP provisioning authoring
+│       └── almfx/                 The one extension. package.json, src/extension.ts
 │
 ├── scripts/                       Standalone .ps1, no module install needed
 ├── tests/Pester/                  Pester 5 tests, all network mocked
 ├── build/                         Invoke-Build.ps1, Install-Dependencies.ps1
-├── docs/                          Documentation
+├── docs/
+│   ├── reference/spfx-alm/        Domain knowledge — single source of truth
+│   ├── adr/                       Architecture decision records
+│   └── ...                        Everything else
 └── samples/                       Example templates, configs, pipelines
 ```
 
@@ -63,16 +64,25 @@ installed). Keeping them apart makes the duplication visible instead of
 accidental. Where logic is genuinely shared, generate the script from the module
 source at build time rather than maintaining two copies.
 
+**Domain knowledge lives in `docs/reference/spfx-alm/`, once.** Cmdlet names,
+procedures, and failure modes are written there and linked to, never restated.
+This is what keeps `AGENTS.md`'s "one place per concern" rule real rather than
+aspirational — the first draft of this repo had the same facts duplicated
+across five shipped skills.
+
 **Skills are split by audience, not by topic.** `.claude/skills/` is loaded
 automatically when you open this repo and is about *contributing*.
 `plugins/almfx/skills/` is packaged and installed by users and is about *doing
-SPFx ALM*. A product skill that mentions `Invoke-Build.ps1` is a bug.
+SPFx ALM with ALMFx* — and is deliberately empty until ALMFx has a surface worth
+driving. A product skill that mentions `Invoke-Build.ps1`, or that only restates
+general PnP knowledge instead of linking to it, is a bug. See
+`plugins/almfx/skills/README.md`.
 
-**Two VS Code extensions, one shared library.** The SPFx ALM audience (admins
-deploying packages) and the provisioning audience (makers authoring templates)
-overlap but are not the same. Starting with two thin extensions over
-`src/vscode/shared/` keeps the option open; merging later is cheap, splitting a
-shipped extension is not. Decide before the first Marketplace publish.
+**One VS Code extension.** `src/vscode/almfx/`. An earlier plan split ALM
+operations from provisioning authoring into two extensions before either had any
+functionality — speculative structure. Nothing is published yet, so splitting
+later, with a `src/vscode/shared/` library, remains cheap. See
+[ADR 0001](adr/0001-record-architecture-decisions.md).
 
 **One version per format.** The PowerShell module, each extension, and the
 plugin version independently. `CHANGELOG.md` notes which format an entry affects.

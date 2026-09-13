@@ -10,23 +10,37 @@ ALMFx is a multi-format toolkit for **SharePoint Framework (SPFx) Application
 Lifecycle Management** and **PnP provisioning**. The same domain logic is
 delivered in several shapes:
 
-| Shape | Path | Ships as |
-|---|---|---|
-| PowerShell module | `src/powershell/ALMFx/` | PowerShell Gallery (`ALMFx`) |
-| Standalone scripts | `scripts/` | Copy-paste `.ps1`, no install |
-| VS Code extensions | `src/vscode/<ext>/` | VS Code Marketplace |
-| Agent skills | `plugins/almfx/skills/` | Claude Code plugin marketplace |
-| Docs / samples | `docs/`, `samples/` | GitHub Pages (later) |
+| Shape | Path | Ships as | State today |
+|---|---|---|---|
+| PowerShell module | `src/powershell/ALMFx/` | PowerShell Gallery (`ALMFx`) | Skeleton — loader, manifest, one placeholder function |
+| VS Code extension | `src/vscode/almfx/` | VS Code Marketplace | Scaffold — activation and one placeholder command |
+| Standalone scripts | `scripts/` | Copy-paste `.ps1`, no install | Nothing yet |
+| Agent skills | `plugins/almfx/skills/` | Claude Code plugin marketplace | **Deliberately empty** |
+| Docs / samples | `docs/`, `samples/` | GitHub Pages (later) | Reference docs written |
 
 One repository, several distribution channels. Domain rules live in exactly one
 place per concern; the shapes are wrappers over it.
+
+**That one place is [`docs/reference/spfx-alm/`](docs/reference/spfx-alm/).**
+Before writing any fact about SPFx, PnP, or app catalogs into a function's help,
+a skill, extension copy, or a README — check whether it belongs in the reference
+instead, and link to it. Cmdlet names, `--ship`, version-bump rules, and the
+shared-service-principal problem live in
+[`docs/reference/spfx-alm/cmdlets.md`](docs/reference/spfx-alm/cmdlets.md) and
+nowhere else.
+
+Nothing ships in `plugins/almfx/skills/` until ALMFx has a surface worth driving.
+A skill that only restates general PnP knowledge would ship a plugin that never
+mentions the product it is named after — that knowledge belongs in the reference
+docs. See `plugins/almfx/skills/README.md`.
 
 ## Golden rules
 
 1. **Never invent a cmdlet.** PnP.PowerShell, CLI for Microsoft 365 and the SPFx
    toolchain have large, similar-looking surfaces. Verify a cmdlet/command
    exists before using it (`Get-Command -Module PnP.PowerShell`, or the vendor
-   docs). See `.claude/skills/pnp-reference/SKILL.md`.
+   docs). Method and verified list:
+   [`docs/reference/spfx-alm/cmdlets.md`](docs/reference/spfx-alm/cmdlets.md).
 2. **Never run destructive tenant operations unprompted.** Anything that
    removes, retracts, unpublishes, overwrites a template, or touches a
    production app catalog must be behind `-WhatIf`/`-Confirm` (PowerShell
@@ -47,10 +61,14 @@ place per concern; the shapes are wrappers over it.
 - Anything in `scripts/` must run **standalone** (no `Import-Module ALMFx`
   requirement). If a script and a cmdlet share logic, the script may be a thin
   wrapper the build generates — do not hand-maintain two copies of real logic.
-- VS Code extensions live in `src/vscode/<extension-name>/`, each with its own
-  `package.json`. Shared TypeScript goes in `src/vscode/shared/`.
-- Skills shipped to users go in `plugins/almfx/skills/`. Skills that help agents
-  work **on this repo** go in `.claude/skills/`. Do not mix them.
+- The VS Code extension lives in `src/vscode/almfx/` with its own `package.json`
+  and version stream. If a second extension is ever added, shared TypeScript
+  goes in `src/vscode/shared/` — see
+  [ADR 0001](docs/adr/0001-record-architecture-decisions.md).
+- Skills shipped to users go in `plugins/almfx/skills/` (empty today). Skills
+  that help agents work **on this repo** go in `.claude/skills/`. Do not mix
+  them, and do not put domain knowledge in either — that goes in
+  `docs/reference/spfx-alm/`.
 
 ## Conventions
 
