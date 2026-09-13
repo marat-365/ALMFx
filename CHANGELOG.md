@@ -13,3 +13,4 @@ is versioned independently; entries note which one they affect.
   `.github/copilot-instructions.md`, path-scoped Copilot instructions).
 - PowerShell module skeleton (`ALMFx`) with build and test harness.
 - Distributable skills plugin scaffold (`plugins/almfx`).
+- Unified agent instructions in `AGENTS.md` and added GitHub PR / Actions permissions guide.
