@@ -1,0 +1,14 @@
+{
+  "name": "almfx",
+  "displayName": "ALMFx — SPFx ALM & PnP provisioning",
+  "version": "0.1.0",
+  "description": "Skills for SharePoint Framework application lifecycle management: deploying and upgrading .sppkg packages, tenant app inventory, API permission approval, PnP provisioning templates, and CI/CD.",
+  "author": {
+    "name": "Marat Bakirov"
+  },
+  "homepage": "https://github.com/marat-365/ALMFx",
+  "repository": "https://github.com/marat-365/ALMFx",
+  "license": "MIT",
+  "keywords": ["sharepoint", "spfx", "pnp", "microsoft365", "alm", "powershell"],
+  "skills": "./skills/"
+}

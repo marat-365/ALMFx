@@ -1,0 +1,41 @@
+name: Publish PowerShell module
+
+on:
+  push:
+    tags: ['ps-v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: windows-latest
+    environment: powershell-gallery   # gate with required reviewers
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        shell: pwsh
+        run: ./build/Install-Dependencies.ps1
+
+      - name: Analyze, test, stage
+        shell: pwsh
+        run: ./build/Invoke-Build.ps1 -Task Analyze, Test, Stage
+
+      - name: Verify tag matches manifest version
+        shell: pwsh
+        run: |
+          $manifest = Import-PowerShellDataFile ./out/ALMFx/ALMFx.psd1
+          $tag = '${{ github.ref_name }}' -replace '^ps-v', ''
+          if ($manifest.ModuleVersion -ne $tag) {
+            throw "Tag $tag does not match ModuleVersion $($manifest.ModuleVersion)."
+          }
+
+      - name: Publish to PowerShell Gallery
+        shell: pwsh
+        env:
+          PSGALLERY_API_KEY: ${{ secrets.PSGALLERY_API_KEY }}
+        run: |
+          if (-not $env:PSGALLERY_API_KEY) { throw 'PSGALLERY_API_KEY is not set.' }
+          Publish-Module -Path ./out/ALMFx -NuGetApiKey $env:PSGALLERY_API_KEY -Verbose

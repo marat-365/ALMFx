@@ -1,0 +1,25 @@
+name: Feature request
+description: Propose a new capability.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What ALM problem are you solving?
+      description: The lifecycle task, not the implementation you have in mind.
+    validations:
+      required: true
+  - type: checkboxes
+    id: formats
+    attributes:
+      label: Which formats should this ship in?
+      options:
+        - label: PowerShell module
+        - label: Standalone script
+        - label: VS Code extension
+        - label: Skill
+  - type: textarea
+    id: today
+    attributes:
+      label: How do you do it today?
+      description: Which cmdlets or manual steps does it replace?

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: PnP PowerShell question
+    url: https://github.com/pnp/powershell/issues
+    about: Questions about PnP.PowerShell cmdlets themselves belong upstream.
+  - name: SharePoint Framework question
+    url: https://github.com/SharePoint/sp-dev-docs/issues
+    about: Questions about SPFx itself belong upstream.

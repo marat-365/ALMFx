@@ -1,0 +1,44 @@
+name: Bug report
+description: Something in ALMFx does not work as documented.
+labels: [bug]
+body:
+  - type: dropdown
+    id: format
+    attributes:
+      label: Which format?
+      options:
+        - PowerShell module
+        - Standalone script
+        - VS Code extension
+        - Skill / plugin
+        - Documentation
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Output of `Get-ALMFxVersion -IncludeDependencies`, or the extension version.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: Redact tenant names and URLs - use `contoso`.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected vs actual
+    validations:
+      required: true
+  - type: checkboxes
+    id: redaction
+    attributes:
+      label: Confirmation
+      options:
+        - label: I have removed all tenant names, URLs, GUIDs, and secrets from this report.
+          required: true

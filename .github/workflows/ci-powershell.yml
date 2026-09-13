@@ -1,0 +1,61 @@
+name: PowerShell CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/powershell/**'
+      - 'scripts/**'
+      - 'tests/**'
+      - 'build/**'
+      - 'PSScriptAnalyzerSettings.psd1'
+      - '.github/workflows/ci-powershell.yml'
+  pull_request:
+    paths:
+      - 'src/powershell/**'
+      - 'scripts/**'
+      - 'tests/**'
+      - 'build/**'
+      - 'PSScriptAnalyzerSettings.psd1'
+      - '.github/workflows/ci-powershell.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache PowerShell modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.local/share/powershell/Modules
+            ~/Documents/PowerShell/Modules
+          key: ${{ runner.os }}-psmodules-v1
+
+      - name: Install dependencies
+        shell: pwsh
+        run: ./build/Install-Dependencies.ps1
+
+      - name: Analyze and test
+        shell: pwsh
+        run: ./build/Invoke-Build.ps1 -Task Analyze, Test
+
+      - name: Stage module
+        shell: pwsh
+        run: ./build/Invoke-Build.ps1 -Task Stage
+
+      - name: Upload module artifact
+        if: matrix.os == 'windows-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ALMFx-module
+          path: out/ALMFx
