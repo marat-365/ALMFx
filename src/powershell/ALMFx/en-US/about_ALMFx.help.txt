@@ -1,0 +1,29 @@
+TOPIC
+    about_ALMFx
+
+SHORT DESCRIPTION
+    Application Lifecycle Management toolkit for SharePoint Framework (SPFx)
+    solutions and PnP provisioning.
+
+LONG DESCRIPTION
+    ALMFx automates the lifecycle of SPFx solutions in Microsoft 365: packaging,
+    deploying to tenant and site collection app catalogs, upgrading installed
+    apps, granting API permissions, and reporting on what is deployed where.
+
+    ALMFx does not replace PnP.PowerShell or the CLI for Microsoft 365 - it
+    builds higher-level, repeatable ALM operations on top of them.
+
+REQUIREMENTS
+    - PowerShell 7.4 or later
+    - PnP.PowerShell 3.x for any function that touches a tenant
+    - SharePoint Administrator, or app catalog owner rights, depending on the
+      operation
+
+SAFETY
+    Every function that modifies or removes anything supports -WhatIf and
+    -Confirm. Run with -WhatIf first against a production tenant.
+
+SEE ALSO
+    https://github.com/marat-365/ALMFx
+    https://pnp.github.io/powershell/
+    https://learn.microsoft.com/sharepoint/dev/spfx/sharepoint-framework-overview

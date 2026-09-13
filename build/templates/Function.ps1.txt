@@ -1,0 +1,58 @@
+function Verb-ALMFxNoun {
+    <#
+    .SYNOPSIS
+        One line, imperative.
+
+    .DESCRIPTION
+        What it does, what permissions it needs, and what it does NOT do.
+        State explicitly if it mutates the tenant.
+
+    .PARAMETER Identity
+        Describe every parameter.
+
+    .PARAMETER Connection
+        An existing PnP connection returned by Connect-PnPOnline -ReturnConnection.
+        If omitted, the ambient connection is used.
+
+    .EXAMPLE
+        Verb-ALMFxNoun -Identity 'contoso-webpart'
+
+        Describe what this example shows.
+
+    .OUTPUTS
+        System.Management.Automation.PSCustomObject
+
+    .LINK
+        https://github.com/marat-365/ALMFx
+    #>
+    [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'High')]
+    [OutputType([PSCustomObject])]
+    param(
+        [Parameter(Mandatory, ValueFromPipelineByPropertyName, Position = 0)]
+        [ValidateNotNullOrEmpty()]
+        [string] $Identity,
+
+        [Parameter()]
+        [object] $Connection
+    )
+
+    begin {
+        Write-Verbose "Starting $($MyInvocation.MyCommand.Name)."
+    }
+
+    process {
+        if (-not $PSCmdlet.ShouldProcess($Identity, 'Describe the action')) {
+            return
+        }
+
+        try {
+            # Real work here. Pass -Connection $Connection through to PnP cmdlets.
+            [PSCustomObject]@{
+                Identity = $Identity
+            }
+        }
+        catch {
+            $PSCmdlet.ThrowTerminatingError($_)
+        }
+    }
+}
