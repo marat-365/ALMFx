@@ -8,8 +8,7 @@
       "Bash(pwsh -File ./build/Invoke-Build.ps1:*)",
       "Bash(npm ci)",
       "Bash(npm run lint:*)",
-      "Bash(npm test:*)",
-      "Read(//home/user/ALMFx/**)"
+      "Bash(npm test:*)"
     ],
     "deny": [
       "Read(./**/*.pfx)",

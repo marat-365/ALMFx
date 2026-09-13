@@ -12,7 +12,11 @@ applyTo: "plugins/**/SKILL.md,.claude/skills/**/SKILL.md,plugins/**/*.md"
   ```
 - `description` is the *only* thing an agent sees before loading the skill.
   Write it as concrete triggers ("Use when deploying an .sppkg…, when an app
-  shows as 'requires upgrade'…"), not as a topic label.
+  shows as 'requires upgrade'…"), not as a topic label. It must open with
+  `Use when`, `Use before`, or `Use after` — an anticipatory skill ("use before
+  writing any PnP call") has a different trigger shape from a reactive one, and
+  forcing it into "Use when" wording makes it trigger worse, not better.
+  `tests/Pester/Repository.Tests.ps1` enforces this.
 - Keep `SKILL.md` focused and under ~500 lines. Long reference material goes in
   sibling files (`reference.md`, `cmdlets.md`) that the skill points to.
 - Two audiences, do not mix:

@@ -1,0 +1,32 @@
+# Normalise line endings in the repository to LF, check out native.
+# This repo is Windows-first for its users but its CI runs on Ubuntu too;
+# without this, every PowerShell file churns between contributors.
+* text=auto
+
+# Explicit, so a misdetected file never gets corrupted.
+*.ps1    text
+*.psm1   text
+*.psd1   text
+*.ts     text
+*.json   text
+*.md     text
+*.yml    text
+*.yaml   text
+
+# Shell scripts must stay LF even when checked out on Windows,
+# or they break the moment they run in a Linux CI container.
+*.sh     text eol=lf
+
+# Binary. .sppkg is a zip - a text conversion silently corrupts it.
+*.sppkg  binary
+*.pfx    binary
+*.p12    binary
+*.png    binary
+*.jpg    binary
+*.ico    binary
+*.vsix   binary
+
+# Keep generated and vendored content out of language statistics
+# so GitHub reports this as a PowerShell repo, not a Markdown one.
+docs/**      linguist-documentation
+samples/**   linguist-documentation
