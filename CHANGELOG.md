@@ -92,10 +92,18 @@ is versioned independently; entries note which one they affect.
   (including, on every Windows CI runner, `%TEMP%` itself, e.g. a Pester
   `$TestDrive`) had every file wrongly excluded, discovering zero artefacts.
   Linux only avoided it by accident (`/tmp`, not "temp"). Fixed to match
-  against the path relative to the solution root instead.
+  against the path relative to the solution root instead. The same fix also
+  surfaced that `RelativePath` (`New-ALMFxEnvironment`/`Set-ALMFxEnvironment`
+  output) used the platform's native path separator instead of a
+  consistent one; it's a logical cross-platform identifier compared
+  against literal forward-slash paths, so on Windows it never matched.
+  Normalized to always use `/`.
 - `build/Invoke-Build.ps1`'s own Analyze task started flagging its own
-  `Write-Host` status-output calls (`PSAvoidUsingWriteHost`) once the
-  `-Path` array fix above made it actually analyze `build/`. Added a
-  `SuppressMessageAttribute` with justification: this is build-console
-  output, not module code, so AGENTS.md's Write-Host prohibition (aimed at
-  functions shipped in the module) does not apply here.
+  `Write-Host` status-output calls (`PSAvoidUsingWriteHost`), and
+  `Install-Dependencies.ps1`'s likewise, once the `-Path` array fix above
+  made it actually analyze `build/`. Excluded `PSAvoidUsingWriteHost` for
+  just the `build/` Analyze pass (a merged-in-memory copy of
+  `PSScriptAnalyzerSettings.psd1`, not a change to the file itself): this
+  is build-console output, not module code, so AGENTS.md's Write-Host
+  prohibition (aimed at functions shipped in the module) does not apply
+  here, and `src/powershell`/`scripts/` keep the rule at full strength.

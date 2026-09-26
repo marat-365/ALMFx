@@ -89,7 +89,10 @@ function Set-ALMFxEnvironment {
         $sourceFiles = Get-ChildItem -LiteralPath $sourceRoot -Recurse -File -Force
 
         foreach ($file in $sourceFiles) {
-            $relativePath = $file.FullName.Substring($sourceRoot.Length).TrimStart('\', '/')
+            # Normalized to forward slashes: see the identical note in
+            # Copy-ALMFxEnvironmentArtefact.ps1 - RelativePath is a logical,
+            # cross-platform identifier, not an OS path.
+            $relativePath = ($file.FullName.Substring($sourceRoot.Length).TrimStart('\', '/')) -replace '\\', '/'
             $destinationPath = [System.IO.Path]::Combine($resolvedPath, $relativePath)
 
             if ($PSCmdlet.ShouldProcess($destinationPath, "Overwrite with .$normalizedEnvironment/$relativePath")) {

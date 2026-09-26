@@ -26,11 +26,6 @@
 .EXAMPLE
     ./build/Invoke-Build.ps1 -Task Analyze, Test -TestOnPS5
 #>
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute(
-    'PSAvoidUsingWriteHost',
-    '',
-    Justification = 'This is the build harness, not module code - AGENTS.md''s Write-Host prohibition targets functions shipped in the module, where Write-Host breaks pipeline/host-redirection use. Colored console status output here (=== Analyze ===, pass/fail banners) is the intended UX for a build script run interactively or in CI logs.'
-)]
 [CmdletBinding()]
 param(
     [Parameter(Position = 0)]
@@ -65,8 +60,19 @@ if ('Analyze' -in $Task) {
     ) | Where-Object { Test-Path -Path $_ }
 
     $settingsPath = Join-Path $repoRoot 'PSScriptAnalyzerSettings.psd1'
+
+    # build/'s own scripts (this one included) are console-status tooling,
+    # not module code, and rely on Write-Host for colored pass/fail output -
+    # AGENTS.md's Write-Host prohibition targets functions shipped in the
+    # module, not the build harness. Excluded only for this path so
+    # src/powershell and scripts/ keep the rule at full strength.
+    $buildPath = Join-Path $repoRoot 'build'
+    $buildSettings = Import-PowerShellDataFile -Path $settingsPath
+    $buildSettings.ExcludeRules = @($buildSettings.ExcludeRules) + 'PSAvoidUsingWriteHost'
+
     $results = foreach ($analyzePath in $analyzePaths) {
-        Invoke-ScriptAnalyzer -Path $analyzePath -Settings $settingsPath -Recurse
+        $pathSettings = if ($analyzePath -eq $buildPath) { $buildSettings } else { $settingsPath }
+        Invoke-ScriptAnalyzer -Path $analyzePath -Settings $pathSettings -Recurse
     }
 
     if ($results) {

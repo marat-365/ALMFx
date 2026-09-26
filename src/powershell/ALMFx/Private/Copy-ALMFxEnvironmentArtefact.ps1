@@ -130,7 +130,13 @@ function Copy-ALMFxEnvironmentArtefact {
             $relevantTokens = $orderedTokens | Where-Object { $text.IndexOf($_.Old, [System.StringComparison]::OrdinalIgnoreCase) -ge 0 }
             if (-not $relevantTokens) { continue }
 
-            $relativePath = $file.FullName.Substring($Path.Length).TrimStart('\', '/')
+            # Normalized to forward slashes: RelativePath is a logical,
+            # cross-platform identifier (compared against literal
+            # forward-slash paths by callers and tests), not an OS path -
+            # native separators here would make it Windows-only-correct,
+            # same class of bug as matching the exclude pattern above
+            # against an absolute path.
+            $relativePath = ($file.FullName.Substring($Path.Length).TrimStart('\', '/')) -replace '\\', '/'
             $destinationPath = [System.IO.Path]::Combine($destinationRoot, $relativePath)
 
             if ($PSCmdlet.ShouldProcess($destinationPath, 'Write environment artefact copy')) {
@@ -178,7 +184,7 @@ function Copy-ALMFxEnvironmentArtefact {
             # was removed from the source.
             $existingFiles = Get-ChildItem -LiteralPath $destinationRoot -Recurse -File -Force -ErrorAction SilentlyContinue
             foreach ($existingFile in $existingFiles) {
-                $existingRelative = $existingFile.FullName.Substring($destinationRoot.Length).TrimStart('\', '/')
+                $existingRelative = ($existingFile.FullName.Substring($destinationRoot.Length).TrimStart('\', '/')) -replace '\\', '/'
                 if (-not $copiedRelativePaths.Contains($existingRelative)) {
                     if ($PSCmdlet.ShouldProcess($existingFile.FullName, 'Remove stale environment artefact copy')) {
                         Remove-Item -LiteralPath $existingFile.FullName -Force
