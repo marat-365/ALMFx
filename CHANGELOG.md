@@ -85,3 +85,17 @@ is versioned independently; entries note which one they affect.
   check) failed on a 403 posting an ancillary PR comment even when its actual
   gate logic passed, because it declared no `permissions:` block. Granted
   `pull-requests: write` and made the comment step non-fatal.
+- `Copy-ALMFxEnvironmentArtefact`/`Get-ALMFxSPArtefactIdentity` excluded
+  `node_modules`/`lib`/`dist`/`temp`/`.git` folders by matching each
+  candidate file's *absolute* path; `-notmatch` is case-insensitive, so on
+  Windows a solution living anywhere under a path containing "Temp"
+  (including, on every Windows CI runner, `%TEMP%` itself, e.g. a Pester
+  `$TestDrive`) had every file wrongly excluded, discovering zero artefacts.
+  Linux only avoided it by accident (`/tmp`, not "temp"). Fixed to match
+  against the path relative to the solution root instead.
+- `build/Invoke-Build.ps1`'s own Analyze task started flagging its own
+  `Write-Host` status-output calls (`PSAvoidUsingWriteHost`) once the
+  `-Path` array fix above made it actually analyze `build/`. Added a
+  `SuppressMessageAttribute` with justification: this is build-console
+  output, not module code, so AGENTS.md's Write-Host prohibition (aimed at
+  functions shipped in the module) does not apply here.

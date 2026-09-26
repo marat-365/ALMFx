@@ -92,8 +92,16 @@ function Get-ALMFxSPArtefactIdentity {
         }
 
         $components = @()
+        # Matched against each file's path *relative to $Path*, not its
+        # absolute FullName - an absolute path very commonly contains a
+        # "temp"/"Temp" segment above the solution root (most notably the OS
+        # temp directory itself, e.g. Windows'
+        # C:\Users\<user>\AppData\Local\Temp\...) that has nothing to do with
+        # the solution's own temp/ build folder. See the identical note in
+        # Copy-ALMFxEnvironmentArtefact.ps1, where matching on FullName
+        # silently excluded every candidate file on Windows.
         $manifestFiles = Get-ChildItem -LiteralPath $Path -Filter '*.manifest.json' -Recurse -File -ErrorAction SilentlyContinue |
-            Where-Object { $_.FullName -notmatch '[\\/](node_modules|lib|dist|temp|\.git)[\\/]' }
+            Where-Object { ($_.FullName.Substring($Path.Length).TrimStart('\', '/')) -notmatch '(^|[\\/])(node_modules|lib|dist|temp|\.git)([\\/]|$)' }
 
         foreach ($manifestFile in $manifestFiles) {
             $text = Get-Content -LiteralPath $manifestFile.FullName -Raw

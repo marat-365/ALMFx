@@ -64,10 +64,21 @@ function Copy-ALMFxEnvironmentArtefact {
 
     process {
         $destinationRoot = [System.IO.Path]::Combine($Path, ".$Environment")
-        $excludePattern = '[\\/](node_modules|lib|dist|temp|\.git|\.[A-Za-z0-9_-]+)([\\/]|$)'
+        $excludePattern = '(^|[\\/])(node_modules|lib|dist|temp|\.git|\.[A-Za-z0-9_-]+)([\\/]|$)'
         # The trailing "\.[A-Za-z0-9_-]+" segment excludes every dot-folder
         # (.dev, .test, .prod, ...) so a re-run never treats a previous run's
         # own output, or another environment's, as a source to scan.
+        #
+        # This MUST be tested against each file's path *relative to $Path*,
+        # never its absolute FullName: -notmatch is case-insensitive, and an
+        # absolute path very commonly contains a "temp"/"Temp" segment above
+        # the solution root that has nothing to do with the solution's own
+        # temp/ build folder - most notably the OS temp directory itself
+        # (Windows: C:\Users\<user>\AppData\Local\Temp\...; a Pester
+        # $TestDrive lives there). Matching on FullName caused every
+        # candidate file to be wrongly excluded on Windows, while working by
+        # accident on Linux only because /tmp does not contain the substring
+        # "temp".
 
         # --- Build the token table: every known original GUID/name, used to
         # both detect which files are relevant and (when CreateUniqueNames is
@@ -109,7 +120,7 @@ function Copy-ALMFxEnvironmentArtefact {
         # on every platform, not just Windows, and Get-ChildItem skips hidden
         # items without -Force even though `ls` on Linux would show them.
         $candidates = Get-ChildItem -LiteralPath $Path -Include '*.json', '*.xml' -Recurse -File -Force -ErrorAction SilentlyContinue |
-            Where-Object { $_.FullName -notmatch $excludePattern }
+            Where-Object { ($_.FullName.Substring($Path.Length).TrimStart('\', '/')) -notmatch $excludePattern }
 
         $copied = [System.Collections.Generic.List[PSCustomObject]]::new()
         $copiedRelativePaths = [System.Collections.Generic.HashSet[string]]::new()

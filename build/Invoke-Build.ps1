@@ -26,6 +26,11 @@
 .EXAMPLE
     ./build/Invoke-Build.ps1 -Task Analyze, Test -TestOnPS5
 #>
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+    'PSAvoidUsingWriteHost',
+    '',
+    Justification = 'This is the build harness, not module code - AGENTS.md''s Write-Host prohibition targets functions shipped in the module, where Write-Host breaks pipeline/host-redirection use. Colored console status output here (=== Analyze ===, pass/fail banners) is the intended UX for a build script run interactively or in CI logs.'
+)]
 [CmdletBinding()]
 param(
     [Parameter(Position = 0)]
