@@ -1,4 +1,4 @@
-function New-ALMFxEnvironment {
+function New-SPFxEnvironment {
     <#
     .SYNOPSIS
         Builds a per-environment copy of an SPFx solution's SharePoint-facing
@@ -37,19 +37,19 @@ function New-ALMFxEnvironment {
         Re-running this function for the same -Environment is safe and
         expected: a persisted identity map at
         <Path>/.almfx/environments/<Environment>.map.json (outside the
-        .<Environment> payload, so Set-ALMFxEnvironment never ships it) is
+        .<Environment> payload, so Set-SPFxEnvironment never ships it) is
         read first, and every artefact already present there keeps exactly
         the id/alias it was assigned before. Only artefacts not yet in the
         map - a newly added web part, for instance - get a freshly generated
         identity. An artefact that no longer exists in the source (removed
         since the last run) is pruned from both the map and the
-        .<Environment> folder, so a later Set-ALMFxEnvironment never
+        .<Environment> folder, so a later Set-SPFxEnvironment never
         re-deploys something that was deleted.
 
         Read-only with respect to the solution's own source files - it only
         ever writes under <Path>/.<Environment>/ and
         <Path>/.almfx/environments/. To actually deploy an environment's
-        files into the solution, run Set-ALMFxEnvironment afterwards.
+        files into the solution, run Set-SPFxEnvironment afterwards.
 
     .PARAMETER Path
         Root folder of the SPFx solution (the folder containing
@@ -73,20 +73,20 @@ function New-ALMFxEnvironment {
         to $false. Pass explicitly to override either way.
 
     .EXAMPLE
-        New-ALMFxEnvironment -Path ./testplaygrounds/spfx-sample-app -Environment dev
+        New-SPFxEnvironment -Path ./testplaygrounds/spfx-sample-app -Environment dev
 
         Builds testplaygrounds/spfx-sample-app/.dev/ with fresh GUIDs and
         "_dev"-suffixed names for every component.
 
     .EXAMPLE
-        New-ALMFxEnvironment -Environment prod
+        New-SPFxEnvironment -Environment prod
 
         Against the current directory. -CreateUniqueNames defaults to $false
         because the environment is "prod", so .prod/ is a verbatim copy of the
         relevant files - no identity change.
 
     .EXAMPLE
-        New-ALMFxEnvironment -Path ./my-solution -Environment dev -WhatIf
+        New-SPFxEnvironment -Path ./my-solution -Environment dev -WhatIf
 
         Reports every file that would be written or removed under
         my-solution/.dev/, without changing anything on disk.

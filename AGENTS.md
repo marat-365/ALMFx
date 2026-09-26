@@ -101,7 +101,13 @@ repo's build system, internal paths, or contributor workflow —
   cross-version logic goes in `Shared/` (see `Compatibility.ps1`); do not add a
   PS7-only API to a function that is supposed to run on 5.1 without a
   documented fallback or an explicit `.NOTES` limitation.
-- Verb must be in `Get-Verb`. Noun is always prefixed `ALMFx` (`Get-ALMFxApp`).
+- Verb must be in `Get-Verb`. Noun is always prefixed `ALMFx` (`Get-ALMFxApp`), with
+  one deliberate exception: `New-SPFxEnvironment`/`Set-SPFxEnvironment` are
+  prefixed `SPFx`, not `ALMFx` - they operate on a generic SPFx solution's own
+  environment concept, not something specific to the ALMFx toolkit, and the
+  `SPFx` prefix names that accurately. Do not "fix" this back to
+  `ALMFxEnvironment` in review; do not add a third prefix for a future
+  function without discussing it first.
 - Every public function requires:
   - `[CmdletBinding()]` (add `SupportsShouldProcess` + `ConfirmImpact='High'` for write/remove)
   - `[OutputType()]`

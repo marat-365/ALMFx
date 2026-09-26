@@ -1,8 +1,8 @@
 #Requires -Modules @{ ModuleName = 'Pester'; ModuleVersion = '5.0.0' }
 
 <#
-    End-to-end New-ALMFxEnvironment -> Set-ALMFxEnvironment sequence, as a
-    user would actually run it. New-/Set-ALMFxEnvironment.Tests.ps1 cover
+    End-to-end New-SPFxEnvironment -> Set-SPFxEnvironment sequence, as a
+    user would actually run it. New-/Set-SPFxEnvironment.Tests.ps1 cover
     each function's own behaviour in isolation; this file is specifically the
     full workflow, including two environments coexisting side by side (the
     whole point of -CreateUniqueNames) without colliding.
@@ -22,15 +22,15 @@ BeforeAll {
     }
 }
 
-Describe 'New-ALMFxEnvironment then Set-ALMFxEnvironment, end to end' {
+Describe 'New-SPFxEnvironment then Set-SPFxEnvironment, end to end' {
 
     It 'builds dev, deploys it, and the deployed root matches the built .dev copy exactly' {
         $app = New-TestFixtureCopy
 
-        $built = New-ALMFxEnvironment -Path $app -Environment dev
+        $built = New-SPFxEnvironment -Path $app -Environment dev
         $built.Files.Count | Should -BeGreaterThan 0
 
-        $deployed = Set-ALMFxEnvironment -Path $app -Environment dev
+        $deployed = Set-SPFxEnvironment -Path $app -Environment dev
         $deployed.Count | Should -Be $built.Files.Count
 
         foreach ($file in $deployed) {
@@ -43,8 +43,8 @@ Describe 'New-ALMFxEnvironment then Set-ALMFxEnvironment, end to end' {
     It 'building dev and prod for the same solution produces two non-colliding identities' {
         $app = New-TestFixtureCopy
 
-        $dev = New-ALMFxEnvironment -Path $app -Environment dev
-        $prod = New-ALMFxEnvironment -Path $app -Environment prod
+        $dev = New-SPFxEnvironment -Path $app -Environment dev
+        $prod = New-SPFxEnvironment -Path $app -Environment prod
 
         $devWebPartId = (Get-Content (Join-Path $app '.dev' 'src' 'webparts' 'helloWorld' 'HelloWorldWebPart.manifest.json') -Raw | ConvertFrom-Json).id
         $prodWebPartId = (Get-Content (Join-Path $app '.prod' 'src' 'webparts' 'helloWorld' 'HelloWorldWebPart.manifest.json') -Raw | ConvertFrom-Json).id
@@ -63,14 +63,14 @@ Describe 'New-ALMFxEnvironment then Set-ALMFxEnvironment, end to end' {
 
     It 'deploying dev then re-deploying prod over it leaves the solution in the prod (original) identity' {
         $app = New-TestFixtureCopy
-        New-ALMFxEnvironment -Path $app -Environment dev | Out-Null
-        New-ALMFxEnvironment -Path $app -Environment prod | Out-Null
+        New-SPFxEnvironment -Path $app -Environment dev | Out-Null
+        New-SPFxEnvironment -Path $app -Environment prod | Out-Null
 
-        Set-ALMFxEnvironment -Path $app -Environment dev | Out-Null
+        Set-SPFxEnvironment -Path $app -Environment dev | Out-Null
         $afterDev = (Get-Content (Join-Path $app 'src' 'webparts' 'helloWorld' 'HelloWorldWebPart.manifest.json') -Raw | ConvertFrom-Json).alias
         $afterDev | Should -Be 'HelloWorldWebPart_dev'
 
-        Set-ALMFxEnvironment -Path $app -Environment prod | Out-Null
+        Set-SPFxEnvironment -Path $app -Environment prod | Out-Null
         $afterProd = (Get-Content (Join-Path $app 'src' 'webparts' 'helloWorld' 'HelloWorldWebPart.manifest.json') -Raw | ConvertFrom-Json).alias
         $afterProd | Should -Be 'HelloWorldWebPart'
     }
@@ -79,8 +79,8 @@ Describe 'New-ALMFxEnvironment then Set-ALMFxEnvironment, end to end' {
         # Structural guard, not a runtime one: neither function's source
         # references Connect-PnPOnline or any network cmdlet - this is pure
         # filesystem/text work, satisfying AGENTS.md golden rule 6.
-        $newSource = Get-Content (Join-Path $RepoRoot 'src' 'powershell' 'ALMFx' 'Public' 'New-ALMFxEnvironment.ps1') -Raw
-        $setSource = Get-Content (Join-Path $RepoRoot 'src' 'powershell' 'ALMFx' 'Public' 'Set-ALMFxEnvironment.ps1') -Raw
+        $newSource = Get-Content (Join-Path $RepoRoot 'src' 'powershell' 'ALMFx' 'Public' 'New-SPFxEnvironment.ps1') -Raw
+        $setSource = Get-Content (Join-Path $RepoRoot 'src' 'powershell' 'ALMFx' 'Public' 'Set-SPFxEnvironment.ps1') -Raw
         $newSource | Should -Not -Match 'Connect-PnP|Invoke-WebRequest|Invoke-RestMethod'
         $setSource | Should -Not -Match 'Connect-PnP|Invoke-WebRequest|Invoke-RestMethod'
     }

@@ -6,7 +6,7 @@ function Resolve-ALMFxEnvironmentMap {
         generating new ones for artefacts not seen before.
 
     .DESCRIPTION
-        This is what makes New-ALMFxEnvironment safe to re-run. Re-running it
+        This is what makes New-SPFxEnvironment safe to re-run. Re-running it
         after adding a new web part must keep every existing component's
         environment GUID exactly as it was - a caller may already have
         deployed the previous set under those GUIDs - and only assign a fresh
@@ -15,7 +15,7 @@ function Resolve-ALMFxEnvironmentMap {
         entry already in the map; a changed alias on an unchanged id is still
         the same artefact. An artefact whose original id is no longer present
         in the current discovery is pruned from the map, so a later
-        Set-ALMFxEnvironment never re-deploys something that was removed from
+        Set-SPFxEnvironment never re-deploys something that was removed from
         the source.
 
         When CreateUniqueNames is $false, no renaming happens at all: the map

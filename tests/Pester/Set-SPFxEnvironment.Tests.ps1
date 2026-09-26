@@ -1,9 +1,9 @@
 #Requires -Modules @{ ModuleName = 'Pester'; ModuleVersion = '5.0.0' }
 
 <#
-    Set-ALMFxEnvironment is the deploy half of the pair: copy everything from
+    Set-SPFxEnvironment is the deploy half of the pair: copy everything from
     <Path>/.<Environment>/ back to <Path>, overwriting. Tested against
-    New-ALMFxEnvironment's real output (not a hand-built fixture) so a
+    New-SPFxEnvironment's real output (not a hand-built fixture) so a
     regression in either function's file-naming/relative-path convention
     shows up here.
 #>
@@ -22,22 +22,22 @@ BeforeAll {
     }
 }
 
-Describe 'Set-ALMFxEnvironment' {
+Describe 'Set-SPFxEnvironment' {
 
     It 'fails clearly when the environment has not been built yet' {
         $app = New-TestFixtureCopy
-        { Set-ALMFxEnvironment -Path $app -Environment dev -ErrorAction Stop } |
+        { Set-SPFxEnvironment -Path $app -Environment dev -ErrorAction Stop } |
             Should -Throw -ErrorId 'ALMFx.EnvironmentNotBuilt*'
     }
 
     Context 'deploying a built environment' {
         BeforeAll {
             $script:App = New-TestFixtureCopy
-            New-ALMFxEnvironment -Path $App -Environment dev | Out-Null
-            $script:Deployed = Set-ALMFxEnvironment -Path $App -Environment dev
+            New-SPFxEnvironment -Path $App -Environment dev | Out-Null
+            $script:Deployed = Set-SPFxEnvironment -Path $App -Environment dev
         }
 
-        It 'deploys exactly the files New-ALMFxEnvironment built' {
+        It 'deploys exactly the files New-SPFxEnvironment built' {
             $builtFiles = Get-ChildItem (Join-Path $App '.dev') -Recurse -File -Force
             $Deployed.Count | Should -Be $builtFiles.Count
         }
@@ -69,10 +69,10 @@ Describe 'Set-ALMFxEnvironment' {
     Context '-WhatIf' {
         It 'writes nothing to disk' {
             $app = New-TestFixtureCopy
-            New-ALMFxEnvironment -Path $app -Environment dev | Out-Null
+            New-SPFxEnvironment -Path $app -Environment dev | Out-Null
             $originalManifest = Get-Content (Join-Path $app 'src' 'webparts' 'helloWorld' 'HelloWorldWebPart.manifest.json') -Raw
 
-            Set-ALMFxEnvironment -Path $app -Environment dev -WhatIf
+            Set-SPFxEnvironment -Path $app -Environment dev -WhatIf
 
             $manifestAfter = Get-Content (Join-Path $app 'src' 'webparts' 'helloWorld' 'HelloWorldWebPart.manifest.json') -Raw
             $manifestAfter | Should -Be $originalManifest
