@@ -3,17 +3,15 @@ name: Test ALMFx Module (PS 5 + PS 7)
 on:
   push:
     branches: [main]
-    paths:
-      - 'src/powershell/**'
-      - 'tests/Pester/**'
-      - 'build/**'
-      - '.github/workflows/test-*.yml'
   pull_request:
     branches: [main]
-    paths:
-      - 'src/powershell/**'
-      - 'tests/Pester/**'
-      - 'build/**'
+
+# Intentionally no `paths:` filter: this workflow's job is used as a required
+# branch-protection status check for auto-merge. A path-filtered required
+# check that never runs on a given PR would leave that PR's merge blocked
+# forever (GitHub has no "skipped" state for required checks), so every PR
+# targeting main must produce a result here regardless of which files it
+# touches.
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -54,25 +52,24 @@ jobs:
   test-ps7:
     name: Test on PowerShell 7+ (Core)
     runs-on: windows-latest
-    strategy:
-      matrix:
-        ps-version: ['7.2', '7.3', '7.4', 'latest']
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Setup PowerShell ${{ matrix.ps-version }}
-        uses: PowerShell/setup-powershell@v2
-        with:
-          powershell-version: ${{ matrix.ps-version }}
+      # windows-latest ships with a current PowerShell 7.x (pwsh) preinstalled;
+      # no setup action is used or required. See:
+      # https://github.com/actions/runner-images/blob/main/images/windows/Windows2022-Readme.md
+      - name: Report PowerShell version
+        shell: pwsh
+        run: $PSVersionTable
 
       - name: Install Dependencies
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          # Install Pester and PSScriptAnalyzer
+          # Install Pester and PSScriptAnalyzer if not already present
           $requiredModules = 'Pester', 'PSScriptAnalyzer'
           foreach ($module in $requiredModules) {
             if (-not (Get-Module $module -ListAvailable)) {
@@ -81,7 +78,7 @@ jobs:
             }
           }
 
-      - name: Run Tests (PS ${{ matrix.ps-version }})
+      - name: Run Tests (PS 7+)
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
@@ -95,13 +92,32 @@ jobs:
     runs-on: windows-latest
     needs: [test-ps5, test-ps7]
     if: always()
+    # Needed for the "Comment on PR" step's issues.createComment call. Without
+    # this the job's default token is read-only (repo setting), and the whole
+    # job - including the pass/fail gate below - fails with a 403 even though
+    # the gate itself evaluated correctly. This job is a required status
+    # check; it must never fail for a reason unrelated to its own gate logic.
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Generate Report
-        shell: powershell
+      - name: Evaluate upstream results
+        shell: pwsh
         run: |
+          $ps5 = '${{ needs.test-ps5.result }}'
+          $ps7 = '${{ needs.test-ps7.result }}'
+
+          Write-Host "PowerShell 5.1 job result: $ps5"
+          Write-Host "PowerShell 7+ job result:  $ps7"
+
+          if ($ps5 -ne 'success' -or $ps7 -ne 'success') {
+              Write-Host "✗ One or more version jobs did not succeed." -ForegroundColor Red
+              exit 1
+          }
+
           Write-Host "✓ All PowerShell versions passed tests" -ForegroundColor Green
           Write-Host "`nCompatibility Matrix:" -ForegroundColor Cyan
           Write-Host "  - PowerShell 5.1 (Windows): PASS" -ForegroundColor Green
@@ -109,13 +125,23 @@ jobs:
           Write-Host "`nModule is compatible with both Desktop and Core editions." -ForegroundColor Cyan
 
       - name: Comment on PR
-        if: github.event_name == 'pull_request'
+        if: always() && github.event_name == 'pull_request'
+        # Cosmetic: posting a PR comment must never fail this required check.
+        # This is exactly the class of bug this workflow exists to eliminate
+        # (see the file header) - an ancillary step taking down the real gate.
+        continue-on-error: true
         uses: actions/github-script@v7
         with:
           script: |
+            const ps5 = '${{ needs.test-ps5.result }}';
+            const ps7 = '${{ needs.test-ps7.result }}';
+            const passed = ps5 === 'success' && ps7 === 'success';
+            const body = passed
+              ? '✓ **Multi-Version Tests Passed**\n\n- PowerShell 5.1 (Windows): ✓\n- PowerShell 7.2+: ✓\n\nModule is compatible with both Desktop and Core editions.'
+              : `✗ **Multi-Version Tests Failed**\n\n- PowerShell 5.1 (Windows): ${ps5}\n- PowerShell 7.2+: ${ps7}\n\nSee the workflow run for details.`;
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '✓ **Multi-Version Tests Passed**\n\n- PowerShell 5.1 (Windows): ✓\n- PowerShell 7.2+: ✓\n\nModule is compatible with both Desktop and Core editions.'
+              body: body
             })

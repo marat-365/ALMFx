@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 <#
 .SYNOPSIS
     Build entry point for ALMFx: analyse, test, and stage the PowerShell module.
@@ -37,8 +37,11 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
+# Join-Path only accepts a single -ChildPath in Windows PowerShell 5.1 (the
+# multi-segment form is a PowerShell 6+ addition), so multi-segment paths are
+# combined via [System.IO.Path]::Combine for 5.1/7+ compatibility.
 $repoRoot   = Split-Path -Parent $PSScriptRoot
-$modulePath = Join-Path $repoRoot 'src' 'powershell' 'ALMFx'
+$modulePath = [System.IO.Path]::Combine($repoRoot, 'src', 'powershell', 'ALMFx')
 $outPath    = Join-Path $repoRoot 'out'
 $failed     = $false
 
@@ -46,10 +49,20 @@ if ('Analyze' -in $Task) {
     Write-Host '=== Analyze ===' -ForegroundColor Cyan
     Import-Module PSScriptAnalyzer -ErrorAction Stop
 
-    $results = Invoke-ScriptAnalyzer `
-        -Path (Join-Path $repoRoot 'src' 'powershell'), (Join-Path $repoRoot 'scripts'), (Join-Path $repoRoot 'build') `
-        -Settings (Join-Path $repoRoot 'PSScriptAnalyzerSettings.psd1') `
-        -Recurse
+    # Invoke-ScriptAnalyzer's -Path parameter is [string], singular, not
+    # [string[]] (confirmed against the Microsoft Learn reference) - despite
+    # accepting pipeline input, a single call cannot be given a multi-element
+    # array. Analyze each root separately and merge the results.
+    $analyzePaths = @(
+        [System.IO.Path]::Combine($repoRoot, 'src', 'powershell')
+        Join-Path $repoRoot 'scripts'
+        Join-Path $repoRoot 'build'
+    ) | Where-Object { Test-Path -Path $_ }
+
+    $settingsPath = Join-Path $repoRoot 'PSScriptAnalyzerSettings.psd1'
+    $results = foreach ($analyzePath in $analyzePaths) {
+        Invoke-ScriptAnalyzer -Path $analyzePath -Settings $settingsPath -Recurse
+    }
 
     if ($results) {
         $results | Format-Table -AutoSize | Out-String | Write-Host
@@ -65,7 +78,7 @@ if ('Test' -in $Task) {
     Import-Module Pester -MinimumVersion 5.0.0 -ErrorAction Stop
 
     $config = New-PesterConfiguration
-    $config.Run.Path       = Join-Path $repoRoot 'tests' 'Pester'
+    $config.Run.Path       = [System.IO.Path]::Combine($repoRoot, 'tests', 'Pester')
     $config.Run.PassThru   = $true
     $config.Output.Verbosity = 'Detailed'
 
