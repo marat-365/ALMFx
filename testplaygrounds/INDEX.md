@@ -41,6 +41,8 @@ ALMFx module now supports **both PowerShell 5.1 and PowerShell 7+** with:
 | `testplaygrounds/test-module.ps1` | Single-version testing harness |
 | `testplaygrounds/run-all-tests.ps1` | Multi-version orchestrator |
 | `testplaygrounds/README.md` | Test playground usage guide |
+| `testplaygrounds/spfx-sample-app/README.md` | Real SPFx fixture overview, component inventory, and build/package steps for ALMFx ALM testing |
+| `testplaygrounds/spfx-sample-app/` | Generated multi-component SPFx sample solution (web part, extensions, library, ACE); start with the linked README |
 | `.github/workflows/test-multiversion.yml` | GitHub Actions CI/CD matrix |
 
 ### Documentation Files
