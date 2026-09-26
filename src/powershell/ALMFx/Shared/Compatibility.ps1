@@ -31,25 +31,30 @@ function Get-PSVersionInfo {
         $version = $PSVersionTable.PSVersion
         $edition = $PSVersionTable.PSEdition
 
-        # Platform detection: PS 5.1 doesn't have $PSVersionTable.Platform
+        # Platform detection: PS 5.1 doesn't have $PSVersionTable.Platform or .OS at all
         $osName = if ($PSVersionTable.ContainsKey('Platform')) {
             # PS 7+
             $PSVersionTable.Platform
         }
-        else {
-            # PS 5.1 fallback
-            if ($PSVersionTable.OS -like '*Windows*') {
+        elseif ($PSVersionTable.ContainsKey('OS')) {
+            # Some PS 6.x builds expose OS without Platform
+            $osDescription = $PSVersionTable.OS
+            if ($osDescription -like '*Windows*') {
                 'Win32NT'
             }
-            elseif ($PSVersionTable.OS -like '*Linux*') {
+            elseif ($osDescription -like '*Linux*') {
                 'Linux'
             }
-            elseif ($PSVersionTable.OS -like '*Darwin*') {
+            elseif ($osDescription -like '*Darwin*') {
                 'Darwin'
             }
             else {
-                $PSVersionTable.OS
+                $osDescription
             }
+        }
+        else {
+            # PS 5.1 (Desktop) has neither key and only ever runs on Windows
+            'Win32NT'
         }
 
         [PSCustomObject]@{

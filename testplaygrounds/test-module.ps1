@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 <#
 .SYNOPSIS
     ALMFx Module Test Playground — Single-Version Testing
@@ -52,7 +52,7 @@ function Test-ALMFxModule {
         $repoRoot = Split-Path -Parent $repoRoot
     }
     
-    $modulePath = Join-Path $repoRoot "src" "powershell" "ALMFx"
+    $modulePath = [System.IO.Path]::Combine($repoRoot, "src", "powershell", "ALMFx")
 
     Write-Host "`n=== ALMFx Test Playground ===" -ForegroundColor Cyan
     Write-Host "PowerShell: $($PSVersionTable.PSVersion) ($($PSVersionTable.PSEdition))" -ForegroundColor Gray
@@ -170,7 +170,7 @@ function Test-ALMFxModule {
         Write-Host "`nPHASE 4: PSScriptAnalyzer Linting" -ForegroundColor Yellow
         try {
             Import-Module PSScriptAnalyzer -ErrorAction Stop
-            $srcPath = Join-Path $repoRoot "src" "powershell"
+            $srcPath = [System.IO.Path]::Combine($repoRoot, "src", "powershell")
             $rules = Join-Path $repoRoot "PSScriptAnalyzerSettings.psd1"
 
             $results = Invoke-ScriptAnalyzer -Path $srcPath -Settings $rules -Recurse
