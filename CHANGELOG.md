@@ -14,3 +14,9 @@ is versioned independently; entries note which one they affect.
 - PowerShell module skeleton (`ALMFx`) with build and test harness.
 - Distributable skills plugin scaffold (`plugins/almfx`).
 - Unified agent instructions in `AGENTS.md` and added GitHub PR / Actions permissions guide.
+
+### Changed
+- Consolidated 10 overlapping `testplaygrounds/` docs (`INDEX.md`, `START-HERE.md`,
+  `SETUP-COMPLETE.md`, `INTEGRATION-GUIDE.md`, `QUICK-REFERENCE.md`,
+  `CODEBASE-STRATEGY.md`, `COMMIT-MESSAGE-TEMPLATE.md`, `FUTURE-MULTI-VARIANT.md`,
+  `SETUP-SUMMARY.txt`, `PS5-PS7-COMPATIBILITY.md`) into a single `README.md`.
