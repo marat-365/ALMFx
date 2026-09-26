@@ -14,8 +14,8 @@ delivered in several shapes:
 
 | Shape | Path | Ships as | State today |
 |---|---|---|---|
-| PowerShell module | `src/powershell/ALMFx/` | PowerShell Gallery (`ALMFx`) | Skeleton — loader, manifest, one placeholder function |
-| VS Code extension | `src/vscode/almfx/` | VS Code Marketplace | Scaffold — activation and one placeholder command |
+| PowerShell module | `src/powershell/ALMFx/` | PowerShell Gallery (`ALMFx`) | `Get-ALMFxVersion`, `New-SPFxEnvironment`, `Set-SPFxEnvironment` |
+| VS Code extension | `src/vscode/almfx/` | VS Code Marketplace | `ALMFx: Show Version` plus interactive `ALMFx: Build/Deploy SPFx Environment` commands wrapping the two module functions above |
 | Standalone scripts | `scripts/` | Copy-paste `.ps1`, no install | Nothing yet |
 | Agent skills | `plugins/almfx/skills/` | Claude Code plugin marketplace | **Deliberately empty** |
 | Docs / samples | `docs/`, `samples/` | GitHub Pages (later) | Reference docs written |
