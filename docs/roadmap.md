@@ -7,20 +7,32 @@ Nothing here is a commitment. It exists so "planned" is distinguishable from
 
 - [x] Repository structure and agent instructions
 - [x] PowerShell module skeleton, build, and test harness
-- [x] Skills plugin scaffold with the core SPFx ALM skills
+- [x] VS Code extension scaffold (`src/vscode/almfx/`) — activation, one
+      placeholder command, no ALM functionality
+- [x] `docs/reference/spfx-alm/` — domain knowledge as single source of truth
+- [x] Repository contract tests (`tests/Pester/Repository.Tests.ps1`)
+- [x] PowerShell 5.1 + 7.4 dual-version support with shared cross-version
+      helpers (`src/powershell/ALMFx/Shared/Compatibility.ps1`), CI matrix
+- [x] `testplaygrounds/spfx-sample-app` — a real, buildable SPFx fixture
+      covering every component type, for offline ALM validation
 - [ ] First real cmdlets: app catalog inventory and package deployment
 
 ## Next
 
 - [ ] Standalone script equivalents for the deployment cmdlets
-- [ ] `almfx-powershell` skill, once the module has a real surface
-- [ ] First VS Code extension (`almfx-spfx-alm`), read-only views first
+- [ ] First real VS Code command, backed by the module or a direct PnP call —
+      read-only views first
+- [ ] First shipped skill in `plugins/almfx/skills/`, once there is an ALMFx
+      surface worth driving rather than general PnP knowledge to restate
+- [ ] Settle [ADR 0002](adr/0002-code-signing.md) (code signing) before this
 - [ ] Publish the module to the PowerShell Gallery
 
 ## Later / undecided
 
-- [ ] Second VS Code extension for provisioning, **or** merge into one.
-      Decide before the first Marketplace publish — see `docs/adr/`.
+- [ ] Second VS Code extension for provisioning, if the ALM and provisioning
+      audiences turn out to want different things — see [ADR 0001](adr/0001-record-architecture-decisions.md)
+- [ ] Script generator so `scripts/` stops being an unbacked promise — see
+      the open decision in ADR 0001
 - [ ] MCP server exposing the same operations to any agent
 - [ ] GitHub Action / Azure DevOps task for pipeline deployment
 - [ ] Governance reporting across multiple tenants

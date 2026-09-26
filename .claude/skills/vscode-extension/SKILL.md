@@ -1,33 +1,36 @@
 ---
 name: vscode-extension
-description: Use when adding, scaffolding, or modifying a VS Code extension under src/vscode - new commands, views, settings, activation events, or shared code between the two extensions. Trigger on "VS Code extension", "add a command", "tree view", "package.json contributes", "vsce".
+description: Use when adding, scaffolding, or modifying the VS Code extension under src/vscode/almfx - new commands, views, settings, or activation events. Trigger on "VS Code extension", "add a command", "tree view", "package.json contributes", "vsce".
 ---
 
 # VS Code extensions in ALMFx
 
-Two extensions over one shared library:
+One extension:
 
 ```
-src/vscode/
-├── shared/                 TypeScript used by both. No vscode API imports
-│                           in pure-domain modules - keep them testable.
-├── almfx-spfx-alm/         ALM operations: deploy, upgrade, inventory
-└── almfx-provisioning/     PnP provisioning template authoring
+src/vscode/almfx/
+├── package.json            Commands, settings, activation
+├── tsconfig.json           strict: true
+└── src/extension.ts        activate() / deactivate()
 ```
 
-**The split is provisional.** The audiences (admins deploying packages vs makers
-authoring templates) overlap. Merging two extensions later is cheap; splitting a
-published one is not. Revisit before the first Marketplace publish, and record
-the decision in `docs/adr/`.
+Nothing is published yet, so a second extension can still be split out cheaply
+if the ALM and provisioning audiences turn out to want different things. Do that
+only with an ADR, and put shared TypeScript in `src/vscode/shared/` at the same
+time. See `docs/adr/0001-record-architecture-decisions.md`.
+
+Domain knowledge - what a command should actually do - is in
+`docs/reference/spfx-alm/`. Do not restate it in extension copy or comments.
 
 ## Adding a command
 
 1. Declare it in `package.json` → `contributes.commands`
-   (`almfx.spfxAlm.deployPackage`, title in Title Case).
+   (`almfx.deployPackage`, title in Title Case).
 2. Register it in `activate()` and push the disposable onto
    `context.subscriptions`.
-3. Add a matching `activationEvents` entry (`onCommand:almfx.spfxAlm.deployPackage`).
-   **Never `"*"`.**
+3. Leave `activationEvents` empty. Since VS Code 1.74 an `onCommand` event is
+   generated automatically for every command in `contributes.commands`, so
+   listing them again is redundant. **Never `"*"`** - CI fails the build on it.
 4. Add `contributes.menus` entries if it belongs in a context menu, with a
    `when` clause narrow enough not to appear everywhere.
 5. Document the command in the extension's `README.md`.
@@ -39,8 +42,8 @@ the decision in `docs/adr/`.
   and actually honour the `CancellationToken`.
 - Secrets go in `context.secrets` (`SecretStorage`). Never `globalState`,
   `workspaceState`, or settings.
-- Settings keys: `almfx.<extension>.<setting>`, declared in
-  `contributes.configuration` with a `description`.
+- Settings keys: `almfx.<setting>`, declared in `contributes.configuration`
+  with a `markdownDescription`.
 - Diagnostics go to a named `OutputChannel`, not `console.log`.
 - Destructive operations get a `showWarningMessage` modal confirmation naming
   the target site or tenant.

@@ -1,0 +1,29 @@
+# https://editorconfig.org
+# PowerShell and TypeScript disagree about indentation. Settle it here once
+# rather than in every contributor's editor.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+
+# PowerShell convention, and what PSScriptAnalyzerSettings.psd1 enforces.
+[*.{ps1,psm1,psd1}]
+indent_size = 4
+
+[*.{ts,tsx,js,json,jsonc}]
+indent_size = 2
+
+[*.{yml,yaml}]
+indent_size = 2
+
+# Two trailing spaces are a hard line break in Markdown.
+[*.md]
+indent_size = 2
+trim_trailing_whitespace = false
+
+[Makefile]
+indent_style = tab
