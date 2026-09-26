@@ -49,10 +49,20 @@ if ('Analyze' -in $Task) {
     Write-Host '=== Analyze ===' -ForegroundColor Cyan
     Import-Module PSScriptAnalyzer -ErrorAction Stop
 
-    $results = Invoke-ScriptAnalyzer `
-        -Path ([System.IO.Path]::Combine($repoRoot, 'src', 'powershell')), (Join-Path $repoRoot 'scripts'), (Join-Path $repoRoot 'build') `
-        -Settings (Join-Path $repoRoot 'PSScriptAnalyzerSettings.psd1') `
-        -Recurse
+    # Invoke-ScriptAnalyzer's -Path parameter is [string], singular, not
+    # [string[]] (confirmed against the Microsoft Learn reference) - despite
+    # accepting pipeline input, a single call cannot be given a multi-element
+    # array. Analyze each root separately and merge the results.
+    $analyzePaths = @(
+        [System.IO.Path]::Combine($repoRoot, 'src', 'powershell')
+        Join-Path $repoRoot 'scripts'
+        Join-Path $repoRoot 'build'
+    ) | Where-Object { Test-Path -Path $_ }
+
+    $settingsPath = Join-Path $repoRoot 'PSScriptAnalyzerSettings.psd1'
+    $results = foreach ($analyzePath in $analyzePaths) {
+        Invoke-ScriptAnalyzer -Path $analyzePath -Settings $settingsPath -Recurse
+    }
 
     if ($results) {
         $results | Format-Table -AutoSize | Out-String | Write-Host
