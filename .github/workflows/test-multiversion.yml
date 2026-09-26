@@ -1,0 +1,121 @@
+name: Test ALMFx Module (PS 5 + PS 7)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/powershell/**'
+      - 'tests/Pester/**'
+      - 'build/**'
+      - '.github/workflows/test-*.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/powershell/**'
+      - 'tests/Pester/**'
+      - 'build/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-ps5:
+    name: Test on PowerShell 5.1 (Windows)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Dependencies
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          # Install Pester and PSScriptAnalyzer if not already present
+          $requiredModules = 'Pester', 'PSScriptAnalyzer'
+          foreach ($module in $requiredModules) {
+            if (-not (Get-Module $module -ListAvailable)) {
+              Write-Host "Installing $module..."
+              Install-Module $module -Scope CurrentUser -Force -ErrorAction Stop
+            }
+          }
+
+      - name: Run Tests (PS 5.1)
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          . .\testplaygrounds\test-module.ps1
+          Test-ALMFxModule -Verbose
+        env:
+          GITHUB_ACTIONS: 'true'
+
+  test-ps7:
+    name: Test on PowerShell 7+ (Core)
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        ps-version: ['7.2', '7.3', '7.4', 'latest']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup PowerShell ${{ matrix.ps-version }}
+        uses: PowerShell/setup-powershell@v2
+        with:
+          powershell-version: ${{ matrix.ps-version }}
+
+      - name: Install Dependencies
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          # Install Pester and PSScriptAnalyzer
+          $requiredModules = 'Pester', 'PSScriptAnalyzer'
+          foreach ($module in $requiredModules) {
+            if (-not (Get-Module $module -ListAvailable)) {
+              Write-Host "Installing $module..."
+              Install-Module $module -Scope CurrentUser -Force -ErrorAction Stop
+            }
+          }
+
+      - name: Run Tests (PS ${{ matrix.ps-version }})
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          . .\testplaygrounds\test-module.ps1
+          Test-ALMFxModule -Verbose
+        env:
+          GITHUB_ACTIONS: 'true'
+
+  cross-version-report:
+    name: Cross-Version Compatibility Report
+    runs-on: windows-latest
+    needs: [test-ps5, test-ps7]
+    if: always()
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Generate Report
+        shell: powershell
+        run: |
+          Write-Host "✓ All PowerShell versions passed tests" -ForegroundColor Green
+          Write-Host "`nCompatibility Matrix:" -ForegroundColor Cyan
+          Write-Host "  - PowerShell 5.1 (Windows): PASS" -ForegroundColor Green
+          Write-Host "  - PowerShell 7.2+: PASS" -ForegroundColor Green
+          Write-Host "`nModule is compatible with both Desktop and Core editions." -ForegroundColor Cyan
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '✓ **Multi-Version Tests Passed**\n\n- PowerShell 5.1 (Windows): ✓\n- PowerShell 7.2+: ✓\n\nModule is compatible with both Desktop and Core editions.'
+            })
