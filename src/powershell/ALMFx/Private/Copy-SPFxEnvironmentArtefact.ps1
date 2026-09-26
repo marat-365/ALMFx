@@ -1,4 +1,4 @@
-function Copy-ALMFxEnvironmentArtefact {
+function Copy-SPFxEnvironmentArtefact {
     <#
     .SYNOPSIS
         Copies every SharePoint-relevant json/xml file in an SPFx solution
@@ -29,7 +29,7 @@ function Copy-ALMFxEnvironmentArtefact {
         <Path>/.<Environment>/ that no longer corresponds to a currently
         relevant source file is removed. This is what keeps a removed
         component from continuing to ship after it's deleted from the
-        solution - see Resolve-ALMFxEnvironmentMap for the matching pruning
+        solution - see Resolve-SPFxEnvironmentMap for the matching pruning
         of the persisted id/name map.
 
     .PARAMETER Path
@@ -39,13 +39,13 @@ function Copy-ALMFxEnvironmentArtefact {
         Environment name; files are written to <Path>/.<Environment>/.
 
     .PARAMETER Map
-        The object returned by Resolve-ALMFxEnvironmentMap.
+        The object returned by Resolve-SPFxEnvironmentMap.
 
     .OUTPUTS
         PSCustomObject per file copied: @{ RelativePath; SourcePath; DestinationPath }
 
     .EXAMPLE
-        Copy-ALMFxEnvironmentArtefact -Path ./testplaygrounds/spfx-sample-app -Environment dev -Map $resolvedMap
+        Copy-SPFxEnvironmentArtefact -Path ./testplaygrounds/spfx-sample-app -Environment dev -Map $resolvedMap
     #>
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([PSCustomObject])]

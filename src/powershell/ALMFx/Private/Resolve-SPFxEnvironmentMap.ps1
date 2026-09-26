@@ -1,4 +1,4 @@
-function Resolve-ALMFxEnvironmentMap {
+function Resolve-SPFxEnvironmentMap {
     <#
     .SYNOPSIS
         Reconciles discovered SPFx artefact identity against a persisted
@@ -47,7 +47,7 @@ function Resolve-ALMFxEnvironmentMap {
 
     .EXAMPLE
         $identity = Get-ALMFxSPArtefactIdentity -Path $solutionPath
-        Resolve-ALMFxEnvironmentMap -Identity $identity -Environment dev -CreateUniqueNames $true -MapPath $mapPath
+        Resolve-SPFxEnvironmentMap -Identity $identity -Environment dev -CreateUniqueNames $true -MapPath $mapPath
     #>
     [CmdletBinding()]
     [OutputType([PSCustomObject])]
