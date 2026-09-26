@@ -1,4 +1,4 @@
-function Set-ALMFxEnvironment {
+function Set-SPFxEnvironment {
     <#
     .SYNOPSIS
         Deploys a previously-built environment's json/xml files into an SPFx
@@ -8,10 +8,10 @@ function Set-ALMFxEnvironment {
     .DESCRIPTION
         Copies every file under <Path>/.<Environment>/ to the same relative
         path under <Path>, overwriting whatever is already there. This is the
-        deploy half of the pair New-ALMFxEnvironment builds: run
-        New-ALMFxEnvironment once to produce the environment-specific files
+        deploy half of the pair New-SPFxEnvironment builds: run
+        New-SPFxEnvironment once to produce the environment-specific files
         (fresh GUIDs and suffixed names, or a verbatim copy for prod), then
-        run Set-ALMFxEnvironment to put them in place before building/packaging
+        run Set-SPFxEnvironment to put them in place before building/packaging
         the solution.
 
         Example: .dev/src/webparts/helloWorld/HelloWorldWebPart.manifest.json
@@ -23,22 +23,22 @@ function Set-ALMFxEnvironment {
 
     .PARAMETER Path
         Root folder of the SPFx solution (the same one passed to
-        New-ALMFxEnvironment). Defaults to the current directory.
+        New-SPFxEnvironment). Defaults to the current directory.
 
     .PARAMETER Environment
         Environment name whose <Path>/.<Environment>/ folder should be
         deployed. Matched case-insensitively against the folder
-        New-ALMFxEnvironment created (environment names are normalized to
+        New-SPFxEnvironment created (environment names are normalized to
         lowercase).
 
     .EXAMPLE
-        Set-ALMFxEnvironment -Path ./testplaygrounds/spfx-sample-app -Environment dev
+        Set-SPFxEnvironment -Path ./testplaygrounds/spfx-sample-app -Environment dev
 
         Copies every file from .../spfx-sample-app/.dev/ into place under
         .../spfx-sample-app/.
 
     .EXAMPLE
-        Set-ALMFxEnvironment -Environment prod -WhatIf
+        Set-SPFxEnvironment -Environment prod -WhatIf
 
         Against the current directory. Reports which files would be
         overwritten without changing anything.
@@ -75,7 +75,7 @@ function Set-ALMFxEnvironment {
         if (-not (Test-Path -LiteralPath $sourceRoot)) {
             $PSCmdlet.ThrowTerminatingError(
                 [System.Management.Automation.ErrorRecord]::new(
-                    [System.IO.DirectoryNotFoundException]::new("'$sourceRoot' does not exist. Run New-ALMFxEnvironment -Path '$resolvedPath' -Environment '$Environment' first."),
+                    [System.IO.DirectoryNotFoundException]::new("'$sourceRoot' does not exist. Run New-SPFxEnvironment -Path '$resolvedPath' -Environment '$Environment' first."),
                     'ALMFx.EnvironmentNotBuilt',
                     [System.Management.Automation.ErrorCategory]::ObjectNotFound,
                     $sourceRoot

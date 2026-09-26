@@ -1,7 +1,7 @@
 #Requires -Modules @{ ModuleName = 'Pester'; ModuleVersion = '5.0.0' }
 
 <#
-    New-ALMFxEnvironment discovers SPFx artefact identity (solution, feature,
+    New-SPFxEnvironment discovers SPFx artefact identity (solution, feature,
     and component ids/aliases) from a real fixture and builds an isolated
     per-environment copy with consistent GUID/name rewriting. Every test here
     runs against a fresh copy of testplaygrounds/spfx-sample-app inside
@@ -25,20 +25,20 @@ BeforeAll {
     }
 }
 
-Describe 'New-ALMFxEnvironment' {
+Describe 'New-SPFxEnvironment' {
 
     It 'fails clearly when Path is not an SPFx solution root' {
         $empty = Join-Path $TestDrive 'not-a-solution'
         New-Item -Path $empty -ItemType Directory -Force | Out-Null
 
-        { New-ALMFxEnvironment -Path $empty -Environment dev -ErrorAction Stop } |
+        { New-SPFxEnvironment -Path $empty -Environment dev -ErrorAction Stop } |
             Should -Throw -ErrorId 'ALMFx.NotAnSPFxSolution*'
     }
 
     Context 'default -CreateUniqueNames' {
         It 'defaults to $true for a non-prod environment name' {
             $app = New-TestFixtureCopy
-            $result = New-ALMFxEnvironment -Path $app -Environment dev
+            $result = New-SPFxEnvironment -Path $app -Environment dev
             $result.CreateUniqueNames | Should -Be $true
         }
 
@@ -49,22 +49,22 @@ Describe 'New-ALMFxEnvironment' {
         ) {
             param($EnvironmentName)
             $app = New-TestFixtureCopy
-            $result = New-ALMFxEnvironment -Path $app -Environment $EnvironmentName
+            $result = New-SPFxEnvironment -Path $app -Environment $EnvironmentName
             $result.CreateUniqueNames | Should -Be $false
         }
 
         It 'can be overridden explicitly in either direction' {
             $app = New-TestFixtureCopy
-            (New-ALMFxEnvironment -Path $app -Environment dev -CreateUniqueNames $false).CreateUniqueNames | Should -Be $false
+            (New-SPFxEnvironment -Path $app -Environment dev -CreateUniqueNames $false).CreateUniqueNames | Should -Be $false
             $app2 = New-TestFixtureCopy
-            (New-ALMFxEnvironment -Path $app2 -Environment prod -CreateUniqueNames $true).CreateUniqueNames | Should -Be $true
+            (New-SPFxEnvironment -Path $app2 -Environment prod -CreateUniqueNames $true).CreateUniqueNames | Should -Be $true
         }
     }
 
     Context 'content-based file discovery' {
         BeforeAll {
             $script:App = New-TestFixtureCopy
-            $script:Result = New-ALMFxEnvironment -Path $App -Environment dev
+            $script:Result = New-SPFxEnvironment -Path $App -Environment dev
         }
 
         It 'copies config/serve.json, which is not in any fixed include-list' {
@@ -97,7 +97,7 @@ Describe 'New-ALMFxEnvironment' {
     Context 'GUID/name rewriting (-CreateUniqueNames $true)' {
         BeforeAll {
             $script:App = New-TestFixtureCopy
-            $script:Result = New-ALMFxEnvironment -Path $App -Environment dev
+            $script:Result = New-SPFxEnvironment -Path $App -Environment dev
             $script:DevManifest = Get-Content (Join-Path $App '.dev' 'src' 'webparts' 'helloWorld' 'HelloWorldWebPart.manifest.json') -Raw
             $script:DevElements = Get-Content (Join-Path $App '.dev' 'sharepoint' 'assets' 'elements.xml') -Raw
             $script:DevInstance = Get-Content (Join-Path $App '.dev' 'sharepoint' 'assets' 'ClientSideInstance.xml') -Raw
@@ -157,7 +157,7 @@ Describe 'New-ALMFxEnvironment' {
     Context '-CreateUniqueNames $false (prod default)' {
         It 'copies files verbatim, with the original id and alias unchanged' {
             $app = New-TestFixtureCopy
-            New-ALMFxEnvironment -Path $app -Environment prod | Out-Null
+            New-SPFxEnvironment -Path $app -Environment prod | Out-Null
 
             $originalManifest = Get-Content (Join-Path $FixtureSource 'src' 'webparts' 'helloWorld' 'HelloWorldWebPart.manifest.json') -Raw
             $prodManifest = Get-Content (Join-Path $app '.prod' 'src' 'webparts' 'helloWorld' 'HelloWorldWebPart.manifest.json') -Raw
@@ -168,7 +168,7 @@ Describe 'New-ALMFxEnvironment' {
 
         It 'still copies config/serve.json (relevance is content-based regardless of rewriting)' {
             $app = New-TestFixtureCopy
-            $result = New-ALMFxEnvironment -Path $app -Environment prod
+            $result = New-SPFxEnvironment -Path $app -Environment prod
             $result.Files.RelativePath | Should -Contain 'config/serve.json'
         }
     }
@@ -176,7 +176,7 @@ Describe 'New-ALMFxEnvironment' {
     Context 'idempotency and incremental components' {
         It 're-running with no source changes reuses every previously assigned id/alias exactly' {
             $app = New-TestFixtureCopy
-            $run1 = New-ALMFxEnvironment -Path $app -Environment dev
+            $run1 = New-SPFxEnvironment -Path $app -Environment dev
             # -Force: without it, .yo-rc.json (a dot-file) is silently
             # excluded from the hash comparison, so both sides would be
             # missing it equally and this test would pass without ever
@@ -184,7 +184,7 @@ Describe 'New-ALMFxEnvironment' {
             $hashesAfterRun1 = Get-ChildItem (Join-Path $app '.dev') -Recurse -File -Force |
                 Sort-Object FullName | ForEach-Object { (Get-FileHash $_.FullName).Hash }
 
-            $run2 = New-ALMFxEnvironment -Path $app -Environment dev
+            $run2 = New-SPFxEnvironment -Path $app -Environment dev
             $hashesAfterRun2 = Get-ChildItem (Join-Path $app '.dev') -Recurse -File -Force |
                 Sort-Object FullName | ForEach-Object { (Get-FileHash $_.FullName).Hash }
 
@@ -194,7 +194,7 @@ Describe 'New-ALMFxEnvironment' {
 
         It 'assigns a new id only to a component added after the first run, leaving existing ones untouched' {
             $app = New-TestFixtureCopy
-            New-ALMFxEnvironment -Path $app -Environment dev | Out-Null
+            New-SPFxEnvironment -Path $app -Environment dev | Out-Null
             $webPartIdBefore = (Get-Content (Join-Path $app '.dev' 'src' 'webparts' 'helloWorld' 'HelloWorldWebPart.manifest.json') -Raw |
                 ConvertFrom-Json).id
 
@@ -211,7 +211,7 @@ Describe 'New-ALMFxEnvironment' {
 }
 "@ | Set-Content (Join-Path $newWebPartDir 'BrandNewWebPart.manifest.json')
 
-            $rerun = New-ALMFxEnvironment -Path $app -Environment dev
+            $rerun = New-SPFxEnvironment -Path $app -Environment dev
             $webPartIdAfter = (Get-Content (Join-Path $app '.dev' 'src' 'webparts' 'helloWorld' 'HelloWorldWebPart.manifest.json') -Raw |
                 ConvertFrom-Json).id
 
@@ -225,12 +225,12 @@ Describe 'New-ALMFxEnvironment' {
 
         It 'prunes a component removed from the source out of the .<environment> folder' {
             $app = New-TestFixtureCopy
-            New-ALMFxEnvironment -Path $app -Environment dev | Out-Null
+            New-SPFxEnvironment -Path $app -Environment dev | Out-Null
             $staleFile = Join-Path $app '.dev' 'src' 'libraries' 'sharedUtilities' 'SharedUtilitiesLibrary.manifest.json'
             $staleFile | Should -Exist
 
             Remove-Item (Join-Path $app 'src' 'libraries' 'sharedUtilities') -Recurse -Force
-            New-ALMFxEnvironment -Path $app -Environment dev | Out-Null
+            New-SPFxEnvironment -Path $app -Environment dev | Out-Null
 
             $staleFile | Should -Not -Exist
         }
@@ -241,7 +241,7 @@ Describe 'New-ALMFxEnvironment' {
             $app = New-TestFixtureCopy
             $beforeCount = (Get-ChildItem $app -Recurse -File -Force).Count
 
-            New-ALMFxEnvironment -Path $app -Environment dev -WhatIf
+            New-SPFxEnvironment -Path $app -Environment dev -WhatIf
 
             $afterCount = (Get-ChildItem $app -Recurse -File -Force).Count
             $afterCount | Should -Be $beforeCount

@@ -9,9 +9,9 @@ is versioned independently; entries note which one they affect.
 ## [Unreleased]
 
 ### Added
-- `New-ALMFxEnvironment` and `Set-ALMFxEnvironment` — build and deploy a
+- `New-SPFxEnvironment` and `Set-SPFxEnvironment` — build and deploy a
   per-environment copy of an SPFx solution's SharePoint-facing json/xml
-  files. `New-ALMFxEnvironment` discovers solution/feature/component identity
+  files. `New-SPFxEnvironment` discovers solution/feature/component identity
   from `config/package-solution.json` and every `src/**/*.manifest.json`,
   scans the whole solution (not a fixed file list — real solutions echo a
   component's GUID in places like `config/serve.json`) for every file that
@@ -25,7 +25,7 @@ is versioned independently; entries note which one they affect.
   `.almfx/environments/<environment>.map.json` keeps every previously
   assigned id/name stable and only generates one for a newly added
   component; a removed component is pruned from both the map and the
-  `.<environment>/` folder. `Set-ALMFxEnvironment` deploys a built
+  `.<environment>/` folder. `Set-SPFxEnvironment` deploys a built
   `.<environment>/` folder's files into the solution. Both are pure
   filesystem/text operations — no PnP dependency, no tenant connection.
 - Repository structure, agent instruction files (`AGENTS.md`, `CLAUDE.md`,
@@ -60,6 +60,13 @@ is versioned independently; entries note which one they affect.
 - `.gitattributes` and `.editorconfig`.
 
 ### Changed
+- **Breaking:** `New-ALMFxEnvironment`/`Set-ALMFxEnvironment` renamed to
+  `New-SPFxEnvironment`/`Set-SPFxEnvironment`. They operate on a generic SPFx
+  solution's own environment concept, not something specific to the ALMFx
+  toolkit, so `SPFx` names that more accurately than the module's own
+  `ALMFx` noun prefix — see the documented exception in AGENTS.md's
+  PowerShell conventions. No behavior change and no map-file schema change;
+  update any script or CI step that calls the old names.
 - `plugins/almfx/skills/` emptied back out. The initial seven skills restated
   general PnP/SPFx knowledge without using anything ALMFx actually does; that
   knowledge moved to `docs/reference/spfx-alm/` instead. Skills ship again once
@@ -93,7 +100,7 @@ is versioned independently; entries note which one they affect.
   `$TestDrive`) had every file wrongly excluded, discovering zero artefacts.
   Linux only avoided it by accident (`/tmp`, not "temp"). Fixed to match
   against the path relative to the solution root instead. The same fix also
-  surfaced that `RelativePath` (`New-ALMFxEnvironment`/`Set-ALMFxEnvironment`
+  surfaced that `RelativePath` (`New-SPFxEnvironment`/`Set-SPFxEnvironment`
   output) used the platform's native path separator instead of a
   consistent one; it's a logical cross-platform identifier compared
   against literal forward-slash paths, so on Windows it never matched.
