@@ -66,13 +66,15 @@ not reference this repo's build system, internal paths, or contributor workflow.
 ## Conventions
 
 ### PowerShell
-- Target **PowerShell 7.4+** (same floor as PnP.PowerShell v3). Do not add
-  Windows PowerShell 5.1-only APIs without saying so in the function help.
+- Target **PowerShell 5.1+ and PowerShell 7.4+** (Desktop and Core editions).
+  - Code must be compatible with both Windows PowerShell 5.1 and PS Core 7+.
+  - PnP.PowerShell v3 requires PS 7+; users on PS 5.1 must use older versions. Document limitations in `.NOTES`.
+  - Use cross-compatible APIs; avoid APIs that are PS7-only without fallback or feature detection.
 - Verb must be in `Get-Verb`. Noun is always prefixed `ALMFx` (`Get-ALMFxApp`).
 - Every public function requires:
   - `[CmdletBinding()]` (add `SupportsShouldProcess` + `ConfirmImpact='High'` for write/remove)
   - `[OutputType()]`
-  - Full comment-based help: `.SYNOPSIS`, `.DESCRIPTION`, `.PARAMETER` for each parameter, at least one `.EXAMPLE`, `.NOTES`, `.LINK`
+  - Full comment-based help: `.SYNOPSIS`, `.DESCRIPTION`, `.PARAMETER` for each parameter, at least one `.EXAMPLE`, `.NOTES` (include PS version notes), `.LINK`
   - Optional `-Connection` parameter passed through to PnP calls
 - Pipeline-friendly: support `ValueFromPipeline` / `ValueFromPipelineByPropertyName`.
 - Emit objects (`[PSCustomObject]` or classes), never `Write-Host`. Progress → `Write-Progress`; diagnostics → `Write-Verbose`.
