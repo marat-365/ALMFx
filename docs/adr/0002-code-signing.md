@@ -26,13 +26,17 @@ The facts that matter ([about_Execution_Policies][aep], [about_Signing][as]):
 - PowerShell checks the Authenticode signature of `.ps1`, `.psm1`, `.psd1`,
   `.ps1xml`, `.cdxml`, and `.xaml` files.
 
-That last point interacts with an open decision in
-[ADR 0001](0001-record-architecture-decisions.md). ALMFx is currently a **script
-module**: `ALMFx.psm1`, `ALMFx.psd1`, and one `.ps1` per function. Every one of
-those file types is signature-checked. A binary module — the shape
-PnP.PowerShell uses — ships its logic in a `.dll`, which execution policy does
-not Authenticode-check at all (WDAC and AppLocker are separate matters). So the
-script-module choice maximises exposure to this problem.
+That last point compounds with a decision now settled in
+[ADR 0001](0001-record-architecture-decisions.md): ALMFx **deliberately** targets
+PowerShell 5.1+, not only 7.4+, specifically so it works for admins stuck on
+Windows PowerShell 5.1 — which is exactly the population most likely to be
+behind an enterprise `AllSigned` policy. ALMFx is also a **script module**:
+`ALMFx.psm1`, `ALMFx.psd1`, and one `.ps1` per function, every one of those file
+types signature-checked. A binary module — the shape PnP.PowerShell uses — ships
+its logic in a `.dll`, which execution policy does not Authenticode-check at all
+(WDAC and AppLocker are separate matters). So this ADR is not a hypothetical
+hedge: the two decisions together mean an unsigned release is more likely to
+fail on the exact users ALMFx is trying to reach on PS 5.1, not fewer.
 
 PnP.PowerShell signs every release; their README attributes it to a .NET
 Foundation certificate. We are next to a signed dependency, which makes an

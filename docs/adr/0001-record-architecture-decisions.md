@@ -33,6 +33,17 @@ reverse gets an ADR before it ships.
 - **Shipped skills stay empty until ALMFx has a surface worth driving.** A skill
   that only restates general PnP knowledge would ship a plugin that never
   mentions the product it is named after.
+- **Target PowerShell 5.1+ and 7.4+, deliberately.** Not a compatibility
+  oversight to be "fixed" back to 7.4-only: many SharePoint/M365 admins run
+  Windows PowerShell 5.1 on locked-down workstations where installing PS 7 is
+  not an option, and ALMFx should be usable there for anything that doesn't
+  require PnP.PowerShell v3 itself (which stays PS 7.4+-only — see
+  `docs/reference/spfx-alm/cmdlets.md`). Cross-version logic lives in
+  `src/powershell/ALMFx/Shared/`. This raises the stakes on
+  [ADR 0002](0002-code-signing.md): 5.1 is exactly where enterprise `AllSigned`
+  execution policy is most common, so an unsigned release is a bigger real-world
+  problem under this decision than it would be for a 7.4-only module, not a
+  smaller one.
 
 ## Open decisions
 
@@ -40,7 +51,8 @@ reverse gets an ADR before it ships.
   one `.ps1` per function). PnP.PowerShell is a binary .NET module. This
   interacts with [ADR 0002](0002-code-signing.md): execution policy
   Authenticode-checks `.ps1`/`.psm1`/`.psd1` but not a compiled `.dll`, so the
-  script-module shape is more exposed in `AllSigned` environments.
+  script-module shape is more exposed in `AllSigned` environments — and more so
+  now that PS 5.1 is an intentional target (above), not less.
 - **Code signing.** See [ADR 0002](0002-code-signing.md). Must be settled before
   the first PowerShell Gallery publish.
 - **Does the module take a hard dependency on PnP.PowerShell?**

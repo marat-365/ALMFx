@@ -73,8 +73,15 @@ docs. See `plugins/almfx/skills/README.md`.
 ## Conventions
 
 ### PowerShell
-- Target **PowerShell 7.4+** (same floor as PnP.PowerShell v3). Do not add
-  Windows PowerShell 5.1-only APIs without saying so in the function help.
+- Target **PowerShell 5.1+ and 7.4+** (Desktop and Core), deliberately. This is
+  a product decision, not an oversight: many SharePoint/M365 admins are on
+  Windows PowerShell 5.1 by default and cannot install PS 7 on locked-down
+  workstations. `Get-ALMFxVersion` and other non-PnP-dependent functions must
+  work there. PnP.PowerShell v3 itself still requires PS 7.4+ — functions that
+  call it are unavoidably PS 7-only, and must say so in `.NOTES`. Shared
+  cross-version logic goes in `Shared/` (see `Compatibility.ps1`); do not add a
+  PS7-only API to a function that is supposed to run on 5.1 without a
+  documented fallback or an explicit `.NOTES` limitation.
 - Verb must be in `Get-Verb`. Noun is always prefixed `ALMFx` (`Get-ALMFxApp`).
 - Every public function: `[CmdletBinding()]`, comment-based help with
   `.SYNOPSIS`, `.DESCRIPTION`, `.PARAMETER`, at least one `.EXAMPLE`, and

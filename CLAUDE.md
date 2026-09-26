@@ -35,7 +35,12 @@ did not need ALMFx for that.
 - Prefer `Task`/`TaskUpdate` tracking for multi-shape changes (a feature often
   touches the module, a script, a skill, and docs).
 - This repo is Windows-first for its users. Paths in docs and examples use
-  Windows conventions; scripts themselves stay cross-platform (PS 7).
+  Windows conventions.
+- **PS 5.1 + 7.4 support is intentional, not a bug to "fix" back to 7.4-only.**
+  See AGENTS.md's PowerShell conventions and ADR 0001. Many target admins run
+  Windows PowerShell 5.1 on locked-down machines; do not flag dual-version
+  support itself as a problem in review — only flag it if a function claims 5.1
+  compatibility but actually uses a 7-only API without a documented fallback.
 - There is no tenant available in CI or in your sandbox. Never write a test or
   a verification step that requires one.
 
