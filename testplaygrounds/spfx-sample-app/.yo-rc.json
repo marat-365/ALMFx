@@ -1,0 +1,24 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "whichFolder": "subdir",
+    "solutionName": "spfx-sample-app",
+    "environment": "spo",
+    "packageManager": "npm",
+    "useGulp": true,
+    "componentType": "adaptiveCardExtension",
+    "template": "none",
+    "componentName": "SampleCard",
+    "componentDescription": "Sample ACE for fixture coverage",
+    "plusBeta": false,
+    "isCreatingSolution": false,
+    "nodeVersion": "22.23.2",
+    "sdksVersions": {},
+    "version": "1.23.2",
+    "libraryName": "spfx-sample-app",
+    "libraryId": "534b46d7-00cd-4dff-afd2-e52b47d513a3",
+    "solutionShortDescription": "spfx-sample-app description",
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "aceTemplateType": "Generic"
+  }
+}
