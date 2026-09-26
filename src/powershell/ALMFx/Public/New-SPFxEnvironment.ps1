@@ -142,7 +142,7 @@ function New-SPFxEnvironment {
         $mapPath = [System.IO.Path]::Combine($mapDir, "$normalizedEnvironment.map.json")
 
         Write-Verbose "Reconciling against identity map '$mapPath' (CreateUniqueNames=$CreateUniqueNames)."
-        $map = Resolve-ALMFxEnvironmentMap -Identity $identity -Environment $normalizedEnvironment -CreateUniqueNames $CreateUniqueNames -MapPath $mapPath
+        $map = Resolve-SPFxEnvironmentMap -Identity $identity -Environment $normalizedEnvironment -CreateUniqueNames $CreateUniqueNames -MapPath $mapPath
 
         if ($PSCmdlet.ShouldProcess($mapPath, 'Write environment identity map')) {
             if (-not (Test-Path -LiteralPath $mapDir)) {
@@ -159,7 +159,7 @@ function New-SPFxEnvironment {
         # Leaving -Confirm unpassed lets the nested call's own ConfirmImpact
         # and the session's actual $ConfirmPreference decide, same as if it
         # had been invoked directly.
-        $files = Copy-ALMFxEnvironmentArtefact -Path $resolvedPath -Environment $normalizedEnvironment -Map $map -WhatIf:$WhatIfPreference
+        $files = Copy-SPFxEnvironmentArtefact -Path $resolvedPath -Environment $normalizedEnvironment -Map $map -WhatIf:$WhatIfPreference
 
         [PSCustomObject]@{
             Environment       = $normalizedEnvironment

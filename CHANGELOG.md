@@ -92,7 +92,7 @@ is versioned independently; entries note which one they affect.
   check) failed on a 403 posting an ancillary PR comment even when its actual
   gate logic passed, because it declared no `permissions:` block. Granted
   `pull-requests: write` and made the comment step non-fatal.
-- `Copy-ALMFxEnvironmentArtefact`/`Get-ALMFxSPArtefactIdentity` excluded
+- `Copy-SPFxEnvironmentArtefact`/`Get-ALMFxSPArtefactIdentity` excluded
   `node_modules`/`lib`/`dist`/`temp`/`.git` folders by matching each
   candidate file's *absolute* path; `-notmatch` is case-insensitive, so on
   Windows a solution living anywhere under a path containing "Temp"

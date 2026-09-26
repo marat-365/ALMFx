@@ -90,7 +90,7 @@ function Set-SPFxEnvironment {
 
         foreach ($file in $sourceFiles) {
             # Normalized to forward slashes: see the identical note in
-            # Copy-ALMFxEnvironmentArtefact.ps1 - RelativePath is a logical,
+            # Copy-SPFxEnvironmentArtefact.ps1 - RelativePath is a logical,
             # cross-platform identifier, not an OS path.
             $relativePath = ($file.FullName.Substring($sourceRoot.Length).TrimStart('\', '/')) -replace '\\', '/'
             $destinationPath = [System.IO.Path]::Combine($resolvedPath, $relativePath)
