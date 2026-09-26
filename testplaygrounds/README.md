@@ -1,168 +1,53 @@
-# testplaygrounds/README.md
 # ALMFx Test Playgrounds
 
-Test and validate the ALMFx module on PowerShell 5.1 and PowerShell 7+ before publishing.
+Local, no-install sandbox for trying out the ALMFx module and SPFx ALM workflows
+before anything ships. Nothing here is published; it's for contributors.
 
-## Quick Start
+## What's in here
 
-### PowerShell 7+ (Recommended for Development)
+| Path | Purpose |
+|---|---|
+| `test-module.ps1` | Single-version test harness — loads the module from `src/powershell/ALMFx`, checks manifest/help/output types, runs each public function. |
+| `run-all-tests.ps1` | Orchestrator — runs `test-module.ps1` on every PowerShell install it finds (5.1 and 7+) and reports pass/fail per version. |
+| `spfx-sample-app/` | A real, generated multi-component SPFx solution (web part, extensions, library, ACE) used as an offline fixture for packaging/inventory/upgrade ALM experiments. See its own [README](spfx-sample-app/README.md). |
+
+## Quick start
+
 ```powershell
-# Run all tests on PS 7+
-pwsh -NoProfile -ExecutionPolicy Bypass -Command ". .\testplaygrounds\test-module.ps1; Test-ALMFxModule"
-```
+# Test on your current PowerShell version
+. .\testplaygrounds\test-module.ps1
+Test-ALMFxModule -Verbose
 
-### PowerShell 5.1 (Windows PowerShell)
-```powershell
-# Run all tests on Windows PowerShell (PS 5.1)
-powershell -NoProfile -ExecutionPolicy Bypass -Command ". .\testplaygrounds\test-module.ps1; Test-ALMFxModule"
-```
-
-### Both Versions (CI/Pre-Release Validation)
-```powershell
-# Requires: pwsh (PowerShell 7+) and Windows PowerShell available
-.\testplaygrounds\run-all-tests.ps1
-```
-
----
-
-## Environment Setup
-
-### PS 7+ Environment
-1. Install PowerShell 7+ from https://github.com/PowerShell/PowerShell/releases
-2. Or via Winget: `winget install Microsoft.PowerShell`
-
-### PS 5.1 Environment
-- Built-in to Windows (run `powershell.exe`)
-- No additional installation needed
-- Limited to Windows
-
----
-
-## Test Playground Features
-
-### `test-module.ps1`
-A standalone testing harness that:
-- Loads the ALMFx module from local source
-- Verifies module structure and manifest
-- Tests each public function
-- Reports version compatibility
-- Checks PSScriptAnalyzer compliance
-- Validates help content
-- Works on both PS 5.1 and PS 7+
-
-**Usage:**
-```powershell
-# Test single function
+# Test a single function
 Test-ALMFxFunction -FunctionName "Get-ALMFxVersion"
 
-# Test all functions
-Test-ALMFxModule
-
-# Detailed output
-Test-ALMFxModule -Verbose
-```
-
-### `run-all-tests.ps1`
-Orchestrator script that:
-- Detects available PowerShell installations
-- Runs test suite on both PS 5.1 and PS 7+
-- Generates comparison report
-- Validates consistency across versions
-- Outputs results in both console and CSV
-
-**Usage:**
-```powershell
-# Run comprehensive test suite
-.\testplaygrounds\run-all-tests.ps1
-
-# Generate CSV report
+# Test on every PowerShell install found (5.1 + 7+), with a CSV report
 .\testplaygrounds\run-all-tests.ps1 -OutputReport results.csv
 ```
 
----
+Run `test-module.ps1` before committing; run `run-all-tests.ps1` before opening a PR.
+CI (`.github/workflows/test-multiversion.yml`) runs the same orchestrator on PS 5.1
+and PS 7.2/7.3/7.4/latest and comments the results on the PR.
 
-## Best Practices
+## Writing PS 5.1 + 7+ compatible code
 
-1. **Before committing code:**
-   ```powershell
-   # Quick local test on your current PowerShell
-   .\testplaygrounds\test-module.ps1
-   ```
+Full conventions live in [`AGENTS.md`](../AGENTS.md#powershell) — this is just the
+cheat sheet for what trips people up:
 
-2. **Before opening a PR:**
-   ```powershell
-   # Full multi-version validation
-   .\testplaygrounds\run-all-tests.ps1
-   ```
-
-3. **After adding a new function:**
-   - Add a test case to `test-module.ps1` > `Test-ALMFxFunction`
-   - Run both PS versions to verify
-   - Check help is consistent: `Get-Help Your-Cmdlet -Full`
-
----
-
-## Known Limitations & Compatibility Notes
-
-### PowerShell 5.1 (Desktop)
-- **Supported:** All SOLID code patterns, PSCustomObject, pipeline operations
-- **Limited:** Some newer APIs (e.g., `$PSNativeCommandArgumentPassing`)
-- **PnP.PowerShell:** Only v2.x; users must not upgrade to v3 on PS5
-
-### PowerShell 7+ (Core)
-- **Full compatibility:** All ALMFx features designed for PS 7.4+
-- **PnP.PowerShell:** v3.x required
-- **Cross-platform:** Linux and macOS supported (for testing)
-
-### Writing Compatible Code
-
-**Avoid (PS7-only):**
-```powershell
-# ❌ Don't use these on PS 5.1
-$PSNativeCommandArgumentPassing
-$PSEdition -eq 'Core'  # Platform-specific APIs
-```
-
-**Use Instead (Compatible):**
-```powershell
-# ✅ Compatible with both
-$PSVersionTable.PSEdition  # Works on both
-$PSVersionTable.Platform   # Works on both
-```
-
----
+- Use `$PSVersionTable.PSEdition`/`.OS`, not `$PSVersionTable.Platform` (PS 5.1 doesn't have it).
+- Don't use `$PSNativeCommandArgumentPassing` or other PS7-only automatic variables.
+- Gate anything PS7-only behind `Get-PSVersionInfo` / `Test-PSVersionRequirement` /
+  `Invoke-WithFallback` from `src/powershell/ALMFx/Shared/Compatibility.ps1`, instead
+  of hand-rolled `$PSVersionTable.PSVersion -ge ...` checks.
+- PnP.PowerShell: v2.x on PS 5.1, v3.x on PS 7+. Note this in a function's `.NOTES`.
 
 ## Troubleshooting
 
-### Module Won't Load
 ```powershell
-# Check module source path
-$modulePath = "A:\...\src\powershell\ALMFx"
-Test-Path -Path $modulePath
-Import-Module -Path $modulePath -Force -Verbose
-```
+# Module won't load
+Import-Module -FullyQualifiedName "<repo>\src\powershell\ALMFx" -Force -Verbose
 
-### Pester Tests Failing
-```powershell
-# Install/update Pester 5
+# Pester / analyzer missing
 Install-Module Pester -MinimumVersion 5.0 -Scope CurrentUser -Force
-```
-
-### PSScriptAnalyzer Issues
-```powershell
-# Install latest analyzer
 Install-Module PSScriptAnalyzer -Scope CurrentUser -Force
 ```
-
----
-
-## CI Integration
-
-For GitHub Actions, the test playgrounds enable:
-- Parallel PS 5 and PS 7 test matrices
-- Pre-publish validation
-- Cross-version compatibility reporting
-- Automatic regression detection
-
-See `.github/workflows/` for integration examples.
-
