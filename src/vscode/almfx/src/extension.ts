@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { runNewSPFxEnvironment, runSetSPFxEnvironment } from './spfxEnvironment';
 
 /**
  * Diagnostics channel. Shipped code never writes to `console`, so this is the
@@ -11,7 +12,9 @@ export function activate(context: vscode.ExtensionContext): void {
     context.subscriptions.push(output);
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('almfx.showVersion', () => showVersion(context))
+        vscode.commands.registerCommand('almfx.showVersion', () => showVersion(context)),
+        vscode.commands.registerCommand('almfx.newSPFxEnvironment', () => runNewSPFxEnvironment(output)),
+        vscode.commands.registerCommand('almfx.setSPFxEnvironment', () => runSetSPFxEnvironment(output))
     );
 
     output.appendLine('ALMFx activated.');

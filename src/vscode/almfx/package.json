@@ -31,6 +31,16 @@
         "command": "almfx.showVersion",
         "title": "Show Version",
         "category": "ALMFx"
+      },
+      {
+        "command": "almfx.newSPFxEnvironment",
+        "title": "Build SPFx Environment",
+        "category": "ALMFx"
+      },
+      {
+        "command": "almfx.setSPFxEnvironment",
+        "title": "Deploy SPFx Environment",
+        "category": "ALMFx"
       }
     ],
     "configuration": {
@@ -40,6 +50,16 @@
           "type": "string",
           "default": "",
           "markdownDescription": "SharePoint Online tenant URL, for example `https://contoso.sharepoint.com`. Leave blank to be prompted."
+        },
+        "almfx.modulePath": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Path to `ALMFx.psd1`, for developing against a local checkout of the module. Leave blank to use an `ALMFx` module already installed from the PowerShell Gallery (`Install-Module ALMFx`)."
+        },
+        "almfx.powershellPath": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Path to the PowerShell executable to use (`pwsh` or `pwsh.exe`). Leave blank to use `pwsh`/`pwsh.exe` from `PATH`."
         }
       }
     }

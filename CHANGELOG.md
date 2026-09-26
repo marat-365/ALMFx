@@ -9,6 +9,12 @@ is versioned independently; entries note which one they affect.
 ## [Unreleased]
 
 ### Added
+- VS Code extension: `ALMFx: Build SPFx Environment` and
+  `ALMFx: Deploy SPFx Environment` commands, running `New-SPFxEnvironment`/
+  `Set-SPFxEnvironment` interactively from the editor (folder picker,
+  environment name prompt, `-CreateUniqueNames` QuickPick, and a QuickPick
+  of already-built environments for deploy). See
+  `src/vscode/almfx/CHANGELOG.md` for the full detail.
 - `New-SPFxEnvironment` and `Set-SPFxEnvironment` — build and deploy a
   per-environment copy of an SPFx solution's SharePoint-facing json/xml
   files. `New-SPFxEnvironment` discovers solution/feature/component identity
