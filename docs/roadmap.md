@@ -11,6 +11,10 @@ Nothing here is a commitment. It exists so "planned" is distinguishable from
       placeholder command, no ALM functionality
 - [x] `docs/reference/spfx-alm/` — domain knowledge as single source of truth
 - [x] Repository contract tests (`tests/Pester/Repository.Tests.ps1`)
+- [x] PowerShell 5.1 + 7.4 dual-version support with shared cross-version
+      helpers (`src/powershell/ALMFx/Shared/Compatibility.ps1`), CI matrix
+- [x] `testplaygrounds/spfx-sample-app` — a real, buildable SPFx fixture
+      covering every component type, for offline ALM validation
 - [ ] First real cmdlets: app catalog inventory and package deployment
 
 ## Next

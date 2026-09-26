@@ -1,0 +1,2 @@
+# Placeholder to ensure Shared/ directory is tracked in git.
+# This folder contains version-agnostic code used by both PS 5.1 and PS 7+ implementations.

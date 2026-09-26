@@ -33,15 +33,19 @@ ALMFx/
 ├── src/
 │   ├── powershell/ALMFx/
 │   │   ├── ALMFx.psd1             Manifest (version, exports, dependencies)
-│   │   ├── ALMFx.psm1             Loader: dot-sources Public/ + Private/
+│   │   ├── ALMFx.psm1             Loader: dot-sources Shared/ + Classes/ + Private/ + Public/
 │   │   ├── Public/                One exported function per file
 │   │   ├── Private/               Internal helpers, not exported
+│   │   ├── Shared/                Cross-version (PS 5.1 / 7+) helpers, e.g. Compatibility.ps1
 │   │   ├── Classes/               PowerShell classes / output types
 │   │   └── en-US/                 about_* help topics
 │   └── vscode/
 │       └── almfx/                 The one extension. package.json, src/extension.ts
 │
 ├── scripts/                       Standalone .ps1, no module install needed
+├── testplaygrounds/                A real buildable SPFx fixture + a standalone
+│                                    test harness, for offline ALM validation —
+│                                    see testplaygrounds/README.md
 ├── tests/Pester/                  Pester 5 tests, all network mocked
 ├── build/                         Invoke-Build.ps1, Install-Dependencies.ps1
 ├── docs/

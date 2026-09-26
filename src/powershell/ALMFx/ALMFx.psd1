@@ -1,14 +1,14 @@
 @{
     RootModule            = 'ALMFx.psm1'
     ModuleVersion         = '0.1.0'
-    CompatiblePSEditions  = @('Core')
+    CompatiblePSEditions  = @('Core', 'Desktop')
     GUID                  = 'f0c7b631-cf4a-4b69-b763-f1bd939cafda'
     Author                = 'Marat Bakirov'
     CompanyName           = 'Unknown'
     Copyright             = '(c) Marat Bakirov. Licensed under the MIT License.'
-    Description           = 'Application Lifecycle Management toolkit for SharePoint Framework (SPFx) solutions and PnP provisioning.'
+    Description           = 'Application Lifecycle Management toolkit for SharePoint Framework (SPFx) solutions and PnP provisioning. Supports PowerShell 5.1+ (Desktop and Core).'
 
-    PowerShellVersion     = '7.4'
+    PowerShellVersion     = '5.1'
 
     # Declared, not bundled. Users install PnP.PowerShell themselves.
     # Uncomment once a function actually depends on it.

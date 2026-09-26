@@ -12,6 +12,16 @@ is versioned independently; entries note which one they affect.
 - Repository structure, agent instruction files (`AGENTS.md`, `CLAUDE.md`,
   `.github/copilot-instructions.md`, path-scoped Copilot instructions).
 - PowerShell module skeleton (`ALMFx`) with build and test harness.
+- Unified agent instructions in `AGENTS.md` and added a GitHub PR / Actions
+  permissions guide (workflow token scopes, PAT scopes, branch protection).
+- PowerShell 5.1 (Desktop) support alongside 7.4+ (Core), deliberately — see
+  AGENTS.md's PowerShell conventions and ADR 0001. Shared cross-version helpers
+  in `src/powershell/ALMFx/Shared/Compatibility.ps1`. CI matrix
+  (`test-multiversion.yml`) runs both.
+- `testplaygrounds/` — a real, generator-built, buildable SPFx solution fixture
+  (`spfx-sample-app`, one of every component type: web part, three extension
+  types, a library, an Adaptive Card Extension) plus a standalone test harness,
+  for validating ALM operations offline without a tenant.
 - VS Code extension scaffold (`src/vscode/almfx`) — activation, one
   placeholder command (`ALMFx: Show Version`), output channel, settings. No ALM
   functionality yet. CI (`ci-vscode.yml`) compiles, lints, and fails the build
@@ -39,9 +49,20 @@ is versioned independently; entries note which one they affect.
 - Two planned VS Code extensions (`almfx-spfx-alm`, `almfx-provisioning`)
   collapsed into one (`src/vscode/almfx`). Nothing was published, so this cost
   nothing; splitting again later, with an ADR, remains available.
+- Consolidated 10 overlapping `testplaygrounds/` docs (`INDEX.md`, `START-HERE.md`,
+  `SETUP-COMPLETE.md`, `INTEGRATION-GUIDE.md`, `QUICK-REFERENCE.md`,
+  `CODEBASE-STRATEGY.md`, `COMMIT-MESSAGE-TEMPLATE.md`, `FUTURE-MULTI-VARIANT.md`,
+  `SETUP-SUMMARY.txt`, `PS5-PS7-COMPATIBILITY.md`) into a single `README.md`.
 
 ### Fixed
 - `.claude/settings.json` granted read access via a machine-specific absolute
   path that resolved on no contributor's machine.
 - Skill descriptions may open with `Use before`/`Use after`, not only
   `Use when`; the previous rule made anticipatory skills read worse.
+- `build/Invoke-Build.ps1`'s Analyze task called `Invoke-ScriptAnalyzer -Path`
+  with a multi-element array; that parameter is singular `[string]`. Fixed to
+  call it once per path and merge results.
+- `test-multiversion.yml`'s `cross-version-report` job (a required status
+  check) failed on a 403 posting an ancillary PR comment even when its actual
+  gate logic passed, because it declared no `permissions:` block. Granted
+  `pull-requests: write` and made the comment step non-fatal.

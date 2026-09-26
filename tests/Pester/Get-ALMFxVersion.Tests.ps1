@@ -1,7 +1,7 @@
 #Requires -Modules @{ ModuleName = 'Pester'; ModuleVersion = '5.0.0' }
 
 BeforeAll {
-    $moduleManifest = Join-Path $PSScriptRoot '..' '..' 'src' 'powershell' 'ALMFx' 'ALMFx.psd1'
+    $moduleManifest = [System.IO.Path]::Combine($PSScriptRoot, '..', '..', 'src', 'powershell', 'ALMFx', 'ALMFx.psd1')
     Import-Module $moduleManifest -Force
 }
 
@@ -35,7 +35,7 @@ Describe 'Get-ALMFxVersion' {
 Describe 'ALMFx module contract' {
 
     It 'exports every function declared in the manifest' {
-        $manifestPath = Join-Path $PSScriptRoot '..' '..' 'src' 'powershell' 'ALMFx' 'ALMFx.psd1'
+        $manifestPath = [System.IO.Path]::Combine($PSScriptRoot, '..', '..', 'src', 'powershell', 'ALMFx', 'ALMFx.psd1')
         $manifest = Import-PowerShellDataFile -Path $manifestPath
         $exported = (Get-Module ALMFx).ExportedFunctions.Keys
 
