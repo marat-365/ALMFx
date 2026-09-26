@@ -16,6 +16,8 @@
 
     FunctionsToExport     = @(
         'Get-ALMFxVersion'
+        'New-ALMFxEnvironment'
+        'Set-ALMFxEnvironment'
     )
     CmdletsToExport       = @()
     VariablesToExport     = @()

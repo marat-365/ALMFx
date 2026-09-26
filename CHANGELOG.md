@@ -9,6 +9,25 @@ is versioned independently; entries note which one they affect.
 ## [Unreleased]
 
 ### Added
+- `New-ALMFxEnvironment` and `Set-ALMFxEnvironment` — build and deploy a
+  per-environment copy of an SPFx solution's SharePoint-facing json/xml
+  files. `New-ALMFxEnvironment` discovers solution/feature/component identity
+  from `config/package-solution.json` and every `src/**/*.manifest.json`,
+  scans the whole solution (not a fixed file list — real solutions echo a
+  component's GUID in places like `config/serve.json`) for every file that
+  references a known id or alias, and copies matches into
+  `.<environment>/`, mirroring relative paths. With `-CreateUniqueNames`
+  (default `$true` unless `-Environment` is `prod`/`production`) every known
+  id becomes a fresh GUID and every alias gets an `_<environment>` suffix,
+  rewritten consistently everywhere it's echoed; fixed Microsoft system GUIDs
+  (e.g. a web part gallery category id) and GUIDs embedded in generated
+  comments are left untouched. Safe to re-run: a persisted map at
+  `.almfx/environments/<environment>.map.json` keeps every previously
+  assigned id/name stable and only generates one for a newly added
+  component; a removed component is pruned from both the map and the
+  `.<environment>/` folder. `Set-ALMFxEnvironment` deploys a built
+  `.<environment>/` folder's files into the solution. Both are pure
+  filesystem/text operations — no PnP dependency, no tenant connection.
 - Repository structure, agent instruction files (`AGENTS.md`, `CLAUDE.md`,
   `.github/copilot-instructions.md`, path-scoped Copilot instructions).
 - PowerShell module skeleton (`ALMFx`) with build and test harness.
