@@ -83,13 +83,19 @@ function Resolve-ALMFxEnvironmentMap {
             $existing.Components | Where-Object { $_.OriginalId -eq $OriginalId } | Select-Object -First 1
         }
 
-        function New-Name {
+        # Named Get- (not New-), even though they compute a fresh GUID/name:
+        # they have no side effect - nothing is created or persisted here,
+        # only a value returned - and PSScriptAnalyzer's
+        # PSUseShouldProcessForStateChangingFunctions rule flags any New-*
+        # function as needing SupportsShouldProcess regardless of whether it
+        # actually changes state.
+        function Get-NewName {
             param([string] $OriginalAlias)
             if (-not $CreateUniqueNames -or [string]::IsNullOrEmpty($OriginalAlias)) { return $OriginalAlias }
             "${OriginalAlias}_${Environment}"
         }
 
-        function New-Id {
+        function Get-NewId {
             param([string] $OriginalId)
             if (-not $CreateUniqueNames) { return $OriginalId }
             ([guid]::NewGuid()).ToString()
@@ -104,9 +110,9 @@ function Resolve-ALMFxEnvironmentMap {
 
             $solutionEntry = [PSCustomObject]@{
                 OriginalId   = $Identity.Solution.OriginalId
-                NewId        = if ($reused) { $reused.NewId } else { New-Id $Identity.Solution.OriginalId }
+                NewId        = if ($reused) { $reused.NewId } else { Get-NewId $Identity.Solution.OriginalId }
                 OriginalName = $Identity.Solution.OriginalName
-                NewName      = if ($reused) { $reused.NewName } else { New-Name $Identity.Solution.OriginalName }
+                NewName      = if ($reused) { $reused.NewName } else { Get-NewName $Identity.Solution.OriginalName }
             }
         }
 
@@ -119,7 +125,7 @@ function Resolve-ALMFxEnvironmentMap {
 
             $featureEntries += [PSCustomObject]@{
                 OriginalId = $feature.OriginalId
-                NewId      = if ($reused) { $reused.NewId } else { New-Id $feature.OriginalId }
+                NewId      = if ($reused) { $reused.NewId } else { Get-NewId $feature.OriginalId }
             }
         }
 
@@ -130,9 +136,9 @@ function Resolve-ALMFxEnvironmentMap {
 
             $componentEntries += [PSCustomObject]@{
                 OriginalId    = $component.OriginalId
-                NewId         = if ($reused) { $reused.NewId } else { New-Id $component.OriginalId }
+                NewId         = if ($reused) { $reused.NewId } else { Get-NewId $component.OriginalId }
                 OriginalAlias = $component.OriginalAlias
-                NewAlias      = if ($reused) { $reused.NewAlias } else { New-Name $component.OriginalAlias }
+                NewAlias      = if ($reused) { $reused.NewAlias } else { Get-NewName $component.OriginalAlias }
             }
         }
 

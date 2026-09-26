@@ -55,8 +55,10 @@ Describe 'New-ALMFxEnvironment then Set-ALMFxEnvironment, end to end' {
         $devWebPartId | Should -Not -Be '439c85de-9fd0-41ee-bc4b-76b1502f4b8c'
 
         # Building one environment must not touch the other's payload folder.
-        (Join-Path $app '.dev').Length | Should -BeGreaterThan 0
-        (Get-ChildItem (Join-Path $app '.prod') -Recurse -File).Count | Should -Be $prod.Files.Count
+        # -Force: a payload can legitimately include a dot-file (.yo-rc.json),
+        # which Get-ChildItem otherwise silently undercounts.
+        (Get-ChildItem (Join-Path $app '.dev') -Recurse -File -Force).Count | Should -Be $dev.Files.Count
+        (Get-ChildItem (Join-Path $app '.prod') -Recurse -File -Force).Count | Should -Be $prod.Files.Count
     }
 
     It 'deploying dev then re-deploying prod over it leaves the solution in the prod (original) identity' {

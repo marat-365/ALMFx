@@ -177,11 +177,15 @@ Describe 'New-ALMFxEnvironment' {
         It 're-running with no source changes reuses every previously assigned id/alias exactly' {
             $app = New-TestFixtureCopy
             $run1 = New-ALMFxEnvironment -Path $app -Environment dev
-            $hashesAfterRun1 = Get-ChildItem (Join-Path $app '.dev') -Recurse -File |
+            # -Force: without it, .yo-rc.json (a dot-file) is silently
+            # excluded from the hash comparison, so both sides would be
+            # missing it equally and this test would pass without ever
+            # actually checking that file's idempotency.
+            $hashesAfterRun1 = Get-ChildItem (Join-Path $app '.dev') -Recurse -File -Force |
                 Sort-Object FullName | ForEach-Object { (Get-FileHash $_.FullName).Hash }
 
             $run2 = New-ALMFxEnvironment -Path $app -Environment dev
-            $hashesAfterRun2 = Get-ChildItem (Join-Path $app '.dev') -Recurse -File |
+            $hashesAfterRun2 = Get-ChildItem (Join-Path $app '.dev') -Recurse -File -Force |
                 Sort-Object FullName | ForEach-Object { (Get-FileHash $_.FullName).Hash }
 
             ($hashesAfterRun2 -join ',') | Should -Be ($hashesAfterRun1 -join ',')

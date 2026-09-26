@@ -135,7 +135,11 @@ function Copy-ALMFxEnvironmentArtefact {
                             # identifier character.
                             "(?<![A-Za-z0-9_])$([regex]::Escape($token.Old))(?![A-Za-z0-9_])"
                         }
-                        $newText = [regex]::Replace($newText, $pattern, [System.Text.RegularExpressions.MatchEvaluator] { param($m) $token.New }, [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
+                        # No param() block: a MatchEvaluator delegate always
+                        # passes one Match argument, but the replacement here
+                        # never depends on it, and declaring an unused $m
+                        # trips PSScriptAnalyzer's unused-parameter rule.
+                        $newText = [regex]::Replace($newText, $pattern, [System.Text.RegularExpressions.MatchEvaluator] { $token.New }, [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
                     }
                 }
 
@@ -146,11 +150,12 @@ function Copy-ALMFxEnvironmentArtefact {
                 Set-Content -LiteralPath $destinationPath -Value $newText -NoNewline
 
                 [void]$copiedRelativePaths.Add($relativePath)
-                $copied.Add([PSCustomObject]@{
+                $copiedEntry = [PSCustomObject]@{
                     RelativePath    = $relativePath
                     SourcePath      = $file.FullName
                     DestinationPath = $destinationPath
-                })
+                }
+                $copied.Add($copiedEntry)
             }
         }
 
