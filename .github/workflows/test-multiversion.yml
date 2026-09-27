@@ -130,7 +130,7 @@ jobs:
         # This is exactly the class of bug this workflow exists to eliminate
         # (see the file header) - an ancillary step taking down the real gate.
         continue-on-error: true
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             const ps5 = '${{ needs.test-ps5.result }}';
